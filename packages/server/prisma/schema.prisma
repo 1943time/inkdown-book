@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Config {
+  key   String @id
+  value String
+}
+
+model Book {
+  id       String   @id
+  name     String
+  files    File[]
+  docs     Doc[]
+  map      String
+  settings String?
+  texts    String
+  created  DateTime @default(now())
+  updated  DateTime @updatedAt
+  lasteUpdateMode String // vscode manual github gitlab
+}
+
+model File {
+  name   String @id
+  bookId String
+  book   Book   @relation(fields: [bookId], references: [id])
+}
+
+model Doc {
+  bookId  String
+  book    Book     @relation(fields: [bookId], references: [id])
+  path    String
+  schema  String
+  updated DateTime
+  sha String
+
+  @@id([path, bookId])
+}

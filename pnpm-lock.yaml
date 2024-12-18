@@ -1,0 +1,39 @@
+lockfileVersion: '6.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+dependencies:
+  '@trpc/client':
+    specifier: 11.0.0-rc.666
+    version: 11.0.0-rc.666(@trpc/server@11.0.0-rc.666)(typescript@5.7.2)
+  '@trpc/server':
+    specifier: 11.0.0-rc.666
+    version: 11.0.0-rc.666(typescript@5.7.2)
+
+packages:
+
+  /@trpc/client@11.0.0-rc.666(@trpc/server@11.0.0-rc.666)(typescript@5.7.2):
+    resolution: {integrity: sha512-BP3H0bktY03m7haVT5QoPR4sn30DNJcvFHsA3Msj3uPRY8JLVE03MR4rVG6T7VbcglORKpyMlRxjpUgdRmJErA==}
+    peerDependencies:
+      '@trpc/server': 11.0.0-rc.666+99556c074
+      typescript: '>=5.6.2'
+    dependencies:
+      '@trpc/server': 11.0.0-rc.666(typescript@5.7.2)
+      typescript: 5.7.2
+    dev: false
+
+  /@trpc/server@11.0.0-rc.666(typescript@5.7.2):
+    resolution: {integrity: sha512-k+jKrdH/owDRRXPR7oPKCQRTu0dOEnqdGh56863ym95sFY8qXE7BhOR8S4WqyZw1CiPZGjRkdFN0q/GsJhKsIA==}
+    peerDependencies:
+      typescript: '>=5.6.2'
+    dependencies:
+      typescript: 5.7.2
+    dev: false
+
+  /typescript@5.7.2:
+    resolution: {integrity: sha512-i5t66RHxDvVN40HfDd1PsEThGNnlMCMT3jMUuoh9/0TaqWevNontacunWyN02LA9/fIbEWlcHZcgTKb9QoaLfg==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+    dev: false
