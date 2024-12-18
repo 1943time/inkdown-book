@@ -2,7 +2,6 @@ import { procedure, router } from '.'
 import { z } from 'zod'
 import { db } from '../prisma'
 import { Prisma } from '@prisma/client'
-
 export const appRouter = router({
   getBookDocs: procedure
     .input(
