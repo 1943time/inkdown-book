@@ -7,8 +7,7 @@
     "build": "remix vite:build",
     "dev": "remix vite:dev",
     "start": "remix-serve ./build/server/index.js",
-    "typecheck": "tsc",
-    "prebuild": "node app/parser/worker/compiler.js"
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@iconify/react": "^4.1.1",

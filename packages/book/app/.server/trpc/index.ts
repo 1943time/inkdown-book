@@ -1,4 +1,5 @@
 import { initTRPC } from '@trpc/server'
+import { appRouter } from './router'
 export const trpc = initTRPC
   .context<{ }>()
   .create()

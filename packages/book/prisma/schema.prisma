@@ -17,18 +17,21 @@ model Book {
   name     String
   files    File[]
   docs     Doc[]
-  map      String
+  map      String @default("[]")
   settings String?
-  texts    String
+  texts    String @default("[]")
   created  DateTime @default(now())
   updated  DateTime @updatedAt
+  main Boolean @default(false)
   lasteUpdateMode String // vscode manual github gitlab
 }
 
 model File {
-  name   String @id
+  path   String
   bookId String
+  name String
   book   Book   @relation(fields: [bookId], references: [id])
+  @@id([path, bookId])
 }
 
 model Doc {
@@ -36,7 +39,7 @@ model Doc {
   book    Book     @relation(fields: [bookId], references: [id])
   path    String
   schema  String
-  updated DateTime
+  updated DateTime @updatedAt
   sha String
 
   @@id([path, bookId])

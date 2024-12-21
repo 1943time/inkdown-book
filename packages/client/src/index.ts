@@ -1,3 +1,3 @@
 import {parse} from './parser/worker/index'
-
-export {parse}
+import { parseDetail } from './parser/schema'
+export {parse, parseDetail}
