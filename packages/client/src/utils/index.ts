@@ -1,10 +1,10 @@
-import { posix } from 'path-browserify'
+import path from 'path-browserify'
 import { customAlphabet } from 'nanoid'
 
 export const isLink = (url: string = '') => /^(?:\w+:)?\/\//i.test(url)
 
 export function convertWindowsToUnixPath(winPath: string) {
-  return posix.normalize(winPath.replace(/\\/g, '/'))
+  return path.posix.normalize(winPath.replace(/\\/g, '/'))
 }
 
 

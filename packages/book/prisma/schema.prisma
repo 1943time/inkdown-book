@@ -22,16 +22,16 @@ model Book {
   texts    String @default("[]")
   created  DateTime @default(now())
   updated  DateTime @updatedAt
-  main Boolean @default(false)
   lasteUpdateMode String // vscode manual github gitlab
 }
 
 model File {
+  id String @id @default(cuid())
   path   String
   bookId String
   name String
   book   Book   @relation(fields: [bookId], references: [id])
-  @@id([path, bookId])
+  @@unique([path, bookId])
 }
 
 model Doc {

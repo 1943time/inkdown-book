@@ -2,29 +2,47 @@ import { CreateTRPCClient, createTRPCClient, httpBatchLink } from '@trpc/client'
 import { AppRouter } from '../../../book/model'
 import { sha1 } from 'js-sha1'
 import { parseDetail } from '../parser/schema'
-import { convertWindowsToUnixPath, isLink, nid } from '../utils'
-import { isAbsolute, join, extname } from 'path-browserify'
+import { isLink, nid } from '../utils'
+import pathPkg from 'path-browserify'
 
 type Mode = 'vscode' | 'inkdown' | 'manual' | 'github' | 'gitlab'
+type Tree = {
+  name: string
+  md?: string
+  path?: string
+  children?: Tree[]
+}
 export class IApi {
   private readonly $t: CreateTRPCClient<AppRouter>
-  public fetch?: typeof fetch
+  private docMap = new Map<
+    string,
+    {
+      name: string
+      sha: string
+      schema: any[]
+      texts: any[]
+      links: { text: string; url: string }[]
+      medias: { type: 'media'; url: string }[]
+    }
+  >()
   private options: {
-    mode: Mode,
+    mode: Mode
     url: string
   }
   uploadFile(data: {
-    name: string,
+    name: string
     path: string
     file: File
     bookId: string
-  }): Promise<{path: string}> {
+  }): Promise<{ path: string }> {
     const form = new FormData()
-    Object.keys(data).forEach((key) => form.append(key, data[key as keyof typeof data]))
-    return (this.fetch || fetch)(this.options.url + '/upload', {
+    Object.keys(data).forEach((key) =>
+      form.append(key, data[key as keyof typeof data])
+    )
+    return fetch(this.options.url + '/upload', {
       method: 'POST',
       body: form
-    }).then(res => res.json())
+    }).then((res) => res.json())
   }
   getFileData: (path: string) => Promise<File | null>
   sha1(text: string) {
@@ -56,11 +74,34 @@ export class IApi {
       url: options.url
     }
   }
-  async syncBook(
-    id: string,
-    name: string,
-    data: { path: string; md: string }[]
-  ) {
+  private transformTree(data: Tree[], parentPath: string[] = []) {
+    for (const item of data) {
+      if (item.name.startsWith('.')) {
+        continue
+      }
+      if (item.children) {
+        item.children = this.transformTree(item.children, [
+          ...parentPath,
+          item.name
+        ])
+      } else {
+        item.path = pathPkg.join(parentPath.join(''), item.name).replace(/\.md$/, '')
+        const { schema, links, medias, texts } = parseDetail(item.md!)
+        this.docMap.set(item.path, {
+          links,
+          medias,
+          texts,
+          schema,
+          name: item.name,
+          sha: this.sha1(item.md!)
+        })
+        delete item.md
+      }
+    }
+    return data
+  }
+  async syncBook(id: string, name: string, data: Tree[]) {
+    this.docMap.clear()
     const { docs, files } = await this.$t.getBookDetails.query({
       bookId: id,
       mode: this.options.mode,
@@ -68,96 +109,74 @@ export class IApi {
     })
     const remoteFilesSet = new Set(files.map((f) => f.path))
     const remoteDocsMap = new Map(docs.map((d) => [d.path, d]))
-    const remove: string[] = []
     const add: { path: string; schema: string; sha: string }[] = []
-    const docsMap = new Map(data.map((f) => [f.path, f]))
-    const folder = new Map<string, any>()
-    const top: any[] = []
-    const textData: {path: string, name: string, texts: any}[] = []
-    // prefetch book
-    for (const item of data) {
-      item.path = convertWindowsToUnixPath(item.path).replace(/\.md$/, '')
-      const stack = item.path.split('/')
-      let stackPath: string[] = []
-      const name = item.path.split('/').pop()!
-      while (stack.length) {
-        const cur = stack.shift()!
-        if (stack.length) {
-          const parent = folder.get(stackPath.join('/')) || top
-          stackPath.push(cur)
-          const data = {
-            name: cur,
-            children: []
-          }
-          if (!folder.get(stackPath.join('/'))) {
-            folder.set(stackPath.join('/'), data)
-          }
-          parent.push(data)
-        } else {
-          const parent = folder.get(stackPath.join('/'))?.children || top
-          parent.push({
-            name,
-            path: item.path
-          })
-        }
-      }
-      if (!remoteDocsMap.has(item.path)) {
-        remove.push(item.path)
-      }
-      const remote = remoteDocsMap.get(item.path)
-      const sha = this.sha1(item.md)
-      if (remote && remote.sha === sha) continue
-      const { schema, links, medias, texts } = parseDetail(item.md)
+    const addFiles = new Set<string>()
+    const textData: { path: string; name: string; texts: any }[] = []
+    const map = this.transformTree(data)
+    for (const [path, item] of this.docMap) {
+      const remote = remoteDocsMap.get(path)
+      const sha = this.sha1(item.sha)
       textData.push({
-        path: item.path,
+        path: path,
         name,
-        texts: JSON.stringify(texts)
+        texts: JSON.stringify(item.texts)
       })
-      for (const link of links) {
-        if (!isLink(link.url) && link.url.endsWith('.md')) {
-          if (!isAbsolute(link.url)) {
-            const target = join(item.path, '..', link.url).replace(/\.md/, '')
-            if (docsMap.get(target)) {
-              link.url = target
-            }
-          }
-        }
-      }
-      for (const file of medias) {
+      
+      for (const file of item.medias) {
         if (!isLink(file.url)) {
-          const path = isAbsolute(file.url)
+          const filePath = pathPkg.isAbsolute(file.url)
             ? file.url
-            : join(item.path, '..', file.url)
-          if (!remoteFilesSet.has(path)) {
-            const data = await this.getFileData(path)
+            : pathPkg.join(path, '..', file.url)
+          addFiles.add(filePath)
+          if (!remoteFilesSet.has(filePath)) {
+            const data = await this.getFileData(filePath)
             if (data && data.size < 1024 * 1024 * 30) {
               try {
                 const res = await this.uploadFile({
                   bookId: id,
-                  path: path,
-                  name: nid() + extname(path),
+                  path: filePath,
+                  name: nid() + pathPkg.extname(filePath),
                   file: data
                 })
                 if (res.path) {
                   file.url = res.path
                 }
-              } catch(e) {
+              } catch (e) {
                 console.error('upload', e)
               }
             }
           }
         }
       }
+      if (remote && remote.sha === sha) continue
+      
+      for (const link of item.links) {
+        if (!isLink(link.url) && link.url.endsWith('.md')) {
+          const target = !pathPkg.isAbsolute(link.url)
+            ? pathPkg.join(path, '..', link.url).replace(/\.md/, '')
+            : '/' + link.url.replace(/\.md/, '')
+          if (this.docMap.get(target)) {
+            link.url = target
+          }
+        }
+      }
       add.push({
-        path: item.path,
-        schema: JSON.stringify(schema),
+        path: path,
+        schema: JSON.stringify(item.schema),
         sha
       })
     }
+    console.log('remote', Array.from(remoteFilesSet), addFiles)
+    const removeFiles = Array.from(remoteFilesSet).filter(
+      (p) => !addFiles.has(p)
+    )
+    const removeDocs = docs.filter(d => !this.docMap.get(d.path)).map(d => d.path)
     return this.$t.syncBookData.mutate({
-      add, remove,
+      add,
+      removeDocs: removeDocs,
+      removeFiles: removeFiles,
       bookId: id,
-      map: JSON.stringify(top),
+      map: JSON.stringify(map),
       texts: JSON.stringify(textData)
     })
   }

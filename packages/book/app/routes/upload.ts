@@ -15,12 +15,10 @@ export const action = async (args: ActionFunctionArgs) => {
     if (!existsSync(assets)) {
       await mkdir(assets, {recursive: true})
     }
-    await db.file.upsert({
-      where: {path_bookId: {path, bookId}},
-      create: {
+    await db.file.create({
+      data: {
         path, bookId, name
-      },
-      update: {name}
+      }
     })
     await writeFile(join(assets, name), Buffer.from(await file.arrayBuffer()))
     return {path: `/assets/${name}`}
