@@ -53,7 +53,7 @@ export function Code(props: {
         className={`group ${state.codeDark ? 'dark' : 'light'} tab-${
           ctx.preferences?.codeTabSize || 2
         } code-highlight num`}
-        style={{background: !state.ready ? '' : ctx.theme === 'dark' ? 'rgba(33, 37, 43,.4)': 'rgb(246, 246, 246)'}}
+        style={{background: !state.ready ? 'transprant' : ctx.theme === 'dark' ? 'rgba(33, 37, 43,.4)': 'rgb(246, 246, 246)'}}
       >
         <div
           className={`absolute z-10 right-2 top-1 flex items-center select-none group-hover:hidden`}

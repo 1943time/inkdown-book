@@ -13,6 +13,7 @@ import { api } from '../.client/api'
 import { useGetSetState } from 'react-use'
 import { IApi } from '@inkdown/client'
 import { localdb } from '../.client/db'
+import { sortTree } from '../utils/common'
 type Tree = {
   md?: string
   name: string
@@ -53,7 +54,7 @@ export function CreateBook(props: {
           filesMap.current.set([...parentPath, name].join('/'), handle)
         }
       }
-      return tree
+      return sortTree(tree)
     },
     []
   )
@@ -87,7 +88,7 @@ export function CreateBook(props: {
               size='small'
               onClick={() => {
                 notif.destroy()
-                window.open(`${location.host}/docs/${v.id}`)
+                window.open(`${location.host}/doc/${v.id}`)
               }}
             >
               Open

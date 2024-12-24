@@ -8,7 +8,6 @@ export const DocCtx = createContext<{
   theme?: string
   openMenu: boolean
   openSearch: boolean
-  showOutLine?: boolean
   chapterName?: string
   setTheme: (theme: string) => void
   openViewImages: (images: string[], index: number) => void

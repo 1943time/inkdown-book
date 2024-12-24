@@ -164,7 +164,7 @@ function Directory({ map, level }: { map: any[]; level: number }) {
                 tree.selectPath(d.path)
               }}
               to={{
-                pathname: `/${params.name}${d.path}`
+                pathname: `/doc/${params.id}/${d.path}`
               }}
             >
               <span className={'ml-0.5'}>{d.name}</span>

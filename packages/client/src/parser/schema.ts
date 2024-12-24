@@ -1,4 +1,6 @@
+import { Node } from 'slate'
 import { parse } from '../parser/worker'
+import { slugify } from '../utils'
 
 const getTexts = (schema: any[], parentPath: number[] = []) => {
   let texts: { type: string; text: string; path: number[] }[] = []
@@ -51,6 +53,10 @@ export const parseDetail = (md: string) => {
     const item = stack.shift()!
     if (item.type === 'media') {
       medias.push(item)
+    }
+    if (item.type === 'head') {
+      item.title = Node.string(item)
+      item.id = slugify(item.title)
     }
     if (item.text && item.url) {
       links.push(item)

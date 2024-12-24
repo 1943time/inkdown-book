@@ -12,11 +12,11 @@ export function Pagination() {
   const paths = useMemo(() => {
     return {
       prev: {
-        url: tree.docs[index - 1]?.path,
+        url: `/doc/${params.id}/${tree.docs[index - 1]?.path}`,
         name: tree.docs[index - 1]?.name
       },
       next: {
-        url: tree.docs[index + 1]?.path,
+        url: `/doc/${params.id}/${tree.docs[index + 1]?.path}`,
         name: tree.docs[index + 1]?.name
       }
     }

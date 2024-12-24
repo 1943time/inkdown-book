@@ -8,6 +8,7 @@ import pathPkg from 'path-browserify'
 type Mode = 'vscode' | 'inkdown' | 'manual' | 'github' | 'gitlab'
 type Tree = {
   name: string
+  folder?: true
   md?: string
   path?: string
   children?: Tree[]
@@ -75,30 +76,39 @@ export class IApi {
     }
   }
   private transformTree(data: Tree[], parentPath: string[] = []) {
+    const docs: Tree[] = []
     for (const item of data) {
       if (item.name.startsWith('.')) {
         continue
       }
       if (item.children) {
-        item.children = this.transformTree(item.children, [
-          ...parentPath,
-          item.name
-        ])
+        docs.push({
+          name: item.name,
+          folder: true,
+          children: this.transformTree(item.children, [
+            ...parentPath,
+            item.name
+          ])
+        })
       } else {
-        item.path = pathPkg.join(parentPath.join(''), item.name).replace(/\.md$/, '')
+        const path = pathPkg.join(parentPath.join(''), item.name).replace(/\.md$/, '')
+        const name = item.name.replace(/\.md$/, '')
         const { schema, links, medias, texts } = parseDetail(item.md!)
-        this.docMap.set(item.path, {
+        this.docMap.set(path, {
           links,
           medias,
           texts,
           schema,
-          name: item.name,
+          name,
           sha: this.sha1(item.md!)
         })
-        delete item.md
+        docs.push({
+          name,
+          path
+        })
       }
     }
-    return data
+    return docs
   }
   async syncBook(id: string, name: string, data: Tree[]) {
     this.docMap.clear()
@@ -166,10 +176,11 @@ export class IApi {
         sha
       })
     }
-    console.log('remote', Array.from(remoteFilesSet), addFiles)
+
     const removeFiles = Array.from(remoteFilesSet).filter(
       (p) => !addFiles.has(p)
     )
+
     const removeDocs = docs.filter(d => !this.docMap.get(d.path)).map(d => d.path)
     return this.$t.syncBookData.mutate({
       add,

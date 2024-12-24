@@ -101,3 +101,10 @@ export const sleep = (time: number) =>  {
 export const apiUrl = import.meta.env.DEV ? 'http://localhost:3000/data' : 'https://api.inkdown.me/data'
 
 export const isLink = (url: string = '') => /^(?:\w+:)?\/\//i.test(url)
+
+export const sortTree = (tree: {name: string, children?: any[]}[]) => {
+  return tree.sort((a, b) => {
+    if (!!a.children !== !!b.children) return a.children ? -1 : 1
+    else return a.name > b.name ? 1 : -1
+  })
+}

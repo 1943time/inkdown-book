@@ -41,9 +41,6 @@ export function Leading(props: {
       window.removeEventListener('scroll', scroll)
     }
   }, [props.schema])
-  if (!ctx.showOutLine) {
-    return null
-  }
   return (
     <div
       className={`leading-container ${props.book ? 'xl:block' : 'lg:block doc'}`}

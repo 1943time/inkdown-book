@@ -47,9 +47,7 @@ export default function () {
         )}
         {!res?.schema && <BackToFirst />}
       </div>
-      {ctx.preferences?.showOutline && (
-        <Leading schema={schema} book={true} />
-      )}
+      <Leading schema={schema} book={true} />
     </>
   )
 }

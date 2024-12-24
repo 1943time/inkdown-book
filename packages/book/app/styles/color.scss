@@ -1,0 +1,159 @@
+:root{
+  --bg: #F8F8F8;
+  --nav: #F8F8F8;
+  --home-bg: rgba(250,250,250,1);
+  --tab: #fafafa;
+  --b1: rgb(229 231 235 / 0.8);
+  --md-text: #0F0F0F;
+  --tree-bg: #fafafa;
+  --md-code-bg: #2a2929;
+  --md-bg-mute: rgba(23, 23, 23, .07);
+  --md-high: rgba(141, 141, 141, 0.5);
+  --md-border: #b9b9b9;
+  --card-bg: #fff;
+  --director-cover: #F3F3F3;
+  --dir-item: #0284c7;
+  --heading-border: #e6e6e6;
+}
+.dark{
+  --bg: #1e1e1f;
+  --tree-bg: #181818;
+  --home-bg: black;
+  --tab: #1d1d1f;
+  --b1: rgb(229 231 235 / 0.1);
+  --md-text: rgba(255, 255, 255, 0.9);
+  --tree-bg: #1E1E1E;
+  --card-bg: #1E1E1E;
+  --md-code-bg: #1c1c1c;
+  --md-bg-mute: rgba(255, 255, 255, .07);
+  --md-high: rgba(255, 255, 255, .2);
+  --md-border: #3f3f46;
+  --director-cover: #161618;
+  --dir-item: #3b82f6;
+  --heading-border: #333333;
+}
+
+html.dark{
+  color-scheme: dark;
+}
+
+.code-bg{
+  background: var(--md-code-bg);
+}
+.def-bg{
+  background: var(--bg);
+}
+.card-bg{
+  background: var(--card-bg);
+}
+.tree-bg{
+  background: var(--tree-bg);
+}
+.nav{
+  background: var(--nav);
+}
+.b1{
+  border-color: var(--b1);
+}
+.b2{
+  @apply border-gray-200 dark:border-gray-200/10;
+}
+
+.md-text{
+  color: var(--md-text);
+}
+html{
+  background: var(--bg);
+  font-family:
+    -apple-system,
+    system-ui,
+    ui-sans-serif,
+    BlinkMacSystemFont,
+    Segoe UI,
+    Roboto,
+    Helvetica Neue,
+    Arial,
+    Noto Sans,
+    sans-serif,
+    Apple Color Emoji,
+    Segoe UI Emoji,
+    Segoe UI Symbol,
+    Noto Color Emoji;
+}
+html.home{
+  background-color: var(--home-bg);
+}
+
+.input{
+  @apply outline-none dark:text-gray-300 text-gray-600 text-sm dark:bg-zinc-900 bg-white
+  h-7 rounded-lg pr-2 border dark:border-zinc-700 border-gray-500/50 dark:focus:border-zinc-500 focus:border-gray-500/80 duration-200;
+}
+
+.high-block{
+  animation: high .3s .1s forwards;
+  @apply rounded-sm;
+}
+
+@keyframes high {
+  from {
+    background: rgba(59, 131, 246, 0);
+  }
+  to{
+    background: rgba(59, 131, 246, 0.5);
+  }
+}
+.panel-bg{
+  @apply dark:bg-[rgba(35,35,35,0.95)] bg-white/95 backdrop-blur;
+}
+.modal-panel{
+  @extend .modal-border, .panel-bg;
+  @apply border rounded-xl shadow-lg shadow-gray-400/80 dark:shadow-gray-600/5;
+}
+
+.dialog-content {
+  @apply dark:bg-[#1F1F1F] rounded-lg bg-white;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08),0 3px 6px -4px rgba(0, 0, 0, 0.12),0 9px 28px 8px rgba(0, 0, 0, 0.05);
+}
+.dark{
+  .dialog-content {
+    box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  }
+}
+
+.tools-panel{
+  @apply rounded-lg dark:bg-[rgba(35,35,35,.95)] dark:text-gray-200 overflow-y-auto bg-white/95 text-gray-600 select-none
+  backdrop-blur-lg shadow-lg shadow-gray-200/70 dark:shadow-gray-600/10 border dark:border-gray-200/10 border-gray-200;
+  max-height: calc(100vh - 100px);
+}
+.context-menu {
+  @extend .panel-bg;
+  @apply absolute p-1 rounded-lg
+   border border-gray-200 dark:border-gray-200/20 text-[13px];
+}
+
+.modal-border{
+  @apply dark:border-gray-200/20 border-transparent;
+}
+
+.ctx-panel{
+  border-radius: 5px;
+  background-color: white;
+  box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.1) 0px 9px 24px;
+}
+
+.dark .ctx-panel{
+  background-color: rgb(37, 37, 37);
+  box-shadow: rgba(15, 15, 15, 0.1) 0px 0px 0px 1px, rgba(15, 15, 15, 0.2) 0px 3px 6px, rgba(15, 15, 15, 0.4) 0px 9px 24px;
+}
+
+.text-link-icon{
+  margin-left: 1px;
+  margin-right: 1px;
+  display: inline;
+  &.external{
+    @apply text-sky-500;
+  }
+  &.inner{
+    @apply text-teal-600/90 dark:text-teal-500;
+  }
+}
