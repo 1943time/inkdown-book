@@ -33,7 +33,7 @@ export default function () {
   const map = JSON.parse(data.book?.map || '[]')
   return (
     <BookContext map={map}>
-      <Header book={true} />
+      <Header title={data.book.name}/>
       <div
         className={`doc-container book show-outline`}
       >

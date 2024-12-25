@@ -5,41 +5,36 @@ import { Link, useParams } from '@remix-run/react'
 import { DocCtx } from '../utils/ctx'
 export function Header(props: {
   title?: string
-  book?: boolean
   siteLogo?: string | null
   siteLogoLink?: string | null
 }) {
   const ctx = useContext(DocCtx)
   const params = useParams()
   return (
-    <header className={`header ${props.book ? 'book' : ''}`}>
-      <div className={`header-content ${!!props.book ? 'max-w-[1400px]' : ''}`}>
+    <header className={`header`}>
+      <div className={`header-content max-w-[1400px]`}>
         <div className='header-name'>
-          {props.book ? (
-            <>
-              <div
-                className={'lg:hidden p-1'}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  ctx.setState!({ openMenu: !ctx.openMenu })
-                }}
-              >
-                <Icon icon={'lucide:menu'} className={'text-xl'} />
-              </div>
-              <span
-                className={
-                  'ml-1 mr-2 dark:text-gray-200/30 font-light text-gray-300'
-                }
-              >
-                /
-              </span>
-            </>
-          ) : null}
+          <div
+            className={'lg:hidden p-1'}
+            onClick={(e) => {
+              e.stopPropagation()
+              ctx.setState!({ openMenu: !ctx.openMenu })
+            }}
+          >
+            <Icon icon={'lucide:menu'} className={'text-xl'} />
+          </div>
+          <span
+            className={
+              'ml-1 mr-2 dark:text-gray-200/30 font-medium text-black text-xl'
+            }
+          >
+            {props.title}
+          </span>
           <Link
             className={'max-w-[calc(100vw_-_170px)] truncate pr-2'}
             to={{ hash: '' }}
           >
-            {props.book ? ctx.chapterName : props.title}
+            {ctx.chapterName}
           </Link>
         </div>
         <div
@@ -74,7 +69,9 @@ export function Header(props: {
             <div className={'p-1 flex items-center text-sm'}>
               <img
                 src={props.siteLogo || '/logo.svg'}
-                className={`w-[22px] h-[22px] shadow-sm shadow-gray-300 rounded-sm ${!!params.space ? 'dark:grayscale dark:hover:grayscale-0' : ''}  dark:shadow-none duration-200`}
+                className={`w-[22px] h-[22px] shadow-sm shadow-gray-300 rounded-sm ${
+                  !!params.space ? 'dark:grayscale dark:hover:grayscale-0' : ''
+                }  dark:shadow-none duration-200`}
               />
             </div>
           </a>

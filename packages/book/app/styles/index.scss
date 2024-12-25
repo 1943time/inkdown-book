@@ -57,7 +57,7 @@ h1.heading:first-child {
 }
 
 .header {
-  @apply fixed left-0 top-0 w-full h-11 flex justify-center z-50 border-b dark:bg-[rgba(30,30,31,.8)] dark:border-white/5 bg-[rgba(248,248,248,.8)] backdrop-blur-md;
+  @apply fixed left-0 top-0 w-full h-14 flex justify-center z-50 border-b dark:bg-[rgba(30,30,31,.8)] dark:border-white/5 border-black/5 bg-[rgba(248,248,248,.8)] backdrop-blur-md;
   &.book {
     @apply lg:hidden;
   }
@@ -68,33 +68,28 @@ h1.heading:first-child {
 }
 
 .doc-container {
-  &.book {
-    padding-left: var(--dir-width);
-    @apply xl:pr-40;
-    .content {
-      @apply lg:pt-14 pt-16;
-      h1,
-      h2,
-      h3,
-      h4,
-      h5 {
-        .anchor {
-          @apply lg:-top-4;
-        }
-      }
-    }
-    &.show-outline {
-      @apply xl:pr-[280px];
-    }
-    .leading-container {
-      right: max(0px, calc((100vw - var(--layout-max-width)) / 2));
-    }
+  padding-left: var(--dir-width);
+  @apply xl:pr-40;
+  &.show-outline {
+    @apply xl:pr-[280px];
+  }
+  .leading-container {
+    right: max(0px, calc((100vw - var(--layout-max-width)) / 2));
   }
   max-width: var(--layout-max-width);
   @apply mx-auto justify-center flex duration-200;
   .content {
-    @apply lg:pt-20 pt-16 lg:pb-20 pb-10 flex-1 px-[18px] md:px-10;
-    max-width: 760px;
+    @apply lg:pt-24 pt-16 lg:pb-20 pb-10 flex-1 px-[18px] md:px-10;
+    max-width: 780px;
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+      .anchor {
+        @apply lg:-top-4;
+      }
+    }
   }
 }
 
@@ -203,7 +198,7 @@ h1.heading:first-child {
 .director {
   width: var(--dir-width);
   left: max(0px, calc((100vw - var(--layout-max-width)) / 2));
-  @apply pl-4 pr-5 pt-9 h-screen fixed top-0 z-50 border-r border-gray-200/50 dark:border-gray-200/5;
+  @apply pl-4 pr-5 pt-16 h-screen fixed top-0 z-50;
 }
 .d-title {
   transition-property: color;
@@ -304,9 +299,6 @@ td {
   .director {
     @apply fixed z-[300] w-4/5 max-w-[360px] left-0 top-0 pt-5 h-screen bg-white duration-300 -translate-x-full pr-3 dark:bg-[#181818];
   }
-  .director-cover {
-    display: none;
-  }
   .doc-container.book {
     padding-left: 0;
   }
@@ -342,13 +334,4 @@ td {
   &.checked {
     @apply dark:bg-blue-600 border-none bg-blue-500 text-white;
   }
-}
-.director-cover {
-  background-color: var(--director-cover);
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  pointer-events: none;
-  width: 50vw;
 }

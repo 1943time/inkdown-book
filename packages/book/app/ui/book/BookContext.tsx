@@ -43,7 +43,6 @@ const readMap = (
 export function BookContext(props: {
   map: any[]
   children: React.ReactNode
-  host?: string
   preferences?: Record<string, any>
 }) {
   const params = useParams()
@@ -116,12 +115,13 @@ export function BookContext(props: {
     const path = getFirstPath(props.map)
     if (path) {
       selectPath(path)
-      const fullPath =  `${params.space ? `/${params.space}` : ''}/book/${params.path}/${path}`
-      navagate(fullPath, {
+      navagate({
+        pathname: `/doc/${params.id}/${path}`
+      }, {
         replace: true
       })
     }
-  }, [params.path, params.space, props.host])
+  }, [params.path, params.space])
 
   const toPosition = useCallback((position?: string) => {
     curDom.current?.classList.remove('high-block')

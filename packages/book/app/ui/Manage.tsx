@@ -7,6 +7,8 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import dayjs from 'dayjs'
 import {BookOutlined} from '@ant-design/icons'
 import { CreateBook } from './CreateBook'
+import { localdb } from '../.client/db'
+import { Link } from '@remix-run/react'
 dayjs.extend(relativeTime)
 export function Manage() {
   const [modal, context] = Modal.useModal()
@@ -88,7 +90,8 @@ export function Manage() {
           columns={[
             {
               title: 'ID',
-              dataIndex: 'id'
+              dataIndex: 'id',
+              render: v => <Link to={`/doc/${v}`} className={'underline'} target={'_blank'}>{v}</Link>
             },
             {
               title: 'Name',
@@ -121,6 +124,7 @@ export function Manage() {
                       onOk: () => {
                         return api.deleteBook.mutate({bookId: record.id}).then(() => {
                           getBooks()
+                          localdb.book.delete(record.id)
                         })
                       }
                     })

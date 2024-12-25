@@ -53,52 +53,6 @@ export function DirectoryFrame(props: {
     <>
       <div className={`director ${ctx.openMenu ? 'open' : ''}`}>
         <div className={'z-10 h-full flex flex-col relative'}>
-          <div className={'pb-1'}>
-            <div
-              onClick={() => {
-                tree.toFirstChapter()
-              }}
-              className={
-                'text-lg font-semibold dark:text-white/80 text-black/80 flex align-baseline'
-              }
-            >
-              <IBook className={'h-7'} />
-              <div
-                className={
-                  'cursor-pointer break-words w-0 flex-1 ml-1 text-pretty'
-                }
-                onClick={() => tree.toFirstChapter()}
-              >
-                {props.name}
-              </div>
-            </div>
-          </div>
-          <div
-            className={`my-3 flex justify-between items-center h-6 ${!ctx.preferences?.links?.length ? 'hidden lg:block' : ''}`}
-          >
-            <div>
-              <ThemeSwitch />
-            </div>
-            {!!ctx.preferences?.links?.length && (
-              <div className={'flex items-center space-x-0.5'}>
-                {ctx.preferences.links.map((l: any, i: number) => (
-                  <Link
-                    to={l.url}
-                    key={i}
-                    target={'_blank'}
-                    className={
-                      'rounded hover:bg-gray-200/60 dark:hover:bg-gray-100/10 duration-200 p-[3px] text-black/70 dark:text-gray-300'
-                    }
-                  >
-                    <Icon icon={l.icon} className={'text-[18px]'} />
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-          <div className={'relative'}>
-            <Search mode={'dir'} />
-          </div>
           <div
             className={
               'flex-1 overflow-y-auto pt-3 pb-10 hide-scroll dir-container px-1'
@@ -110,7 +64,6 @@ export function DirectoryFrame(props: {
             space
           </div>
         </div>
-        <div className={'director-cover'} />
       </div>
       {state.visible && (
         <div

@@ -2,7 +2,7 @@ import { CreateTRPCClient, createTRPCClient, httpBatchLink } from '@trpc/client'
 import { AppRouter } from '../../../book/model'
 import { sha1 } from 'js-sha1'
 import { parseDetail } from '../parser/schema'
-import { isLink, nid } from '../utils'
+import { isLink, nid, slugify } from '../utils'
 import pathPkg from 'path-browserify'
 
 type Mode = 'vscode' | 'inkdown' | 'manual' | 'github' | 'gitlab'
@@ -85,14 +85,15 @@ export class IApi {
         docs.push({
           name: item.name,
           folder: true,
+          path: [...parentPath, item.name].map(p => slugify(p)).join('/'),
           children: this.transformTree(item.children, [
             ...parentPath,
             item.name
           ])
         })
       } else {
-        const path = pathPkg.join(parentPath.join(''), item.name).replace(/\.md$/, '')
         const name = item.name.replace(/\.md$/, '')
+        const path = [...parentPath, name].map(p => slugify(p)).join('/')
         const { schema, links, medias, texts } = parseDetail(item.md!)
         this.docMap.set(path, {
           links,
@@ -117,6 +118,7 @@ export class IApi {
       mode: this.options.mode,
       name
     })
+    
     const remoteFilesSet = new Set(files.map((f) => f.path))
     const remoteDocsMap = new Map(docs.map((d) => [d.path, d]))
     const add: { path: string; schema: string; sha: string }[] = []

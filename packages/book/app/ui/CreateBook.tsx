@@ -31,7 +31,8 @@ export function CreateBook(props: {
   const [form] = Form.useForm()
   const [state, setState] = useGetSetState({
     folderName: '',
-    submitting: false
+    submitting: false,
+    settings: {} as Record<string, any>
   })
 
   const readDir = useCallback(
@@ -58,11 +59,52 @@ export function CreateBook(props: {
     },
     []
   )
-
+  const getSettings = useCallback(async () => {
+    try {
+      const dir = await dirHanndle.current!.getDirectoryHandle('.inkdown')
+      const json = await dir.getFileHandle('settings.json')
+      const file = await json.getFile()
+      const text = await file.text()
+      return JSON.parse(text)
+    } catch(e) {
+      return null
+    }
+  }, [])
+  const getFiles = useCallback(async (data: {
+    id: string
+    name: string
+  }):Promise<Tree[]> => {
+    return new Promise((resolve, reject) => {
+      readDir(dirHanndle.current!).then(res => {
+        if (!state().settings.id) {
+          Modal.confirm({
+            title: 'Note',
+            content: 'There is no inkdown/settings.json file in this folder. Should it be generated automatically?',
+            onCancel: reject,
+            onOk: async () => {
+              const dir = await dirHanndle.current!.getDirectoryHandle('.inkdown', {create: true})
+              const json = await dir.getFileHandle('settings.json', {create: true})
+              const text = await (await json.getFile()).text()
+              const settings = JSON.parse(text || '{}')
+              settings.name = data.name
+              settings.id = data.id
+              const writer = await json.createWritable()
+              writer.write(JSON.stringify(settings))
+              writer.close()
+              resolve(res)
+            }
+          })
+        } else {
+          resolve(res)
+        }
+      })
+    })
+  }, [])
   const createBook = useCallback(() => {
     form.validateFields().then(async (v) => {
       try {
-        const tree = await readDir(dirHanndle.current!)
+        const tree = await getFiles(v)
+        getSettings()
         const client = new IApi({
           url: '',
           getFileData: async (path: string) => {
@@ -187,9 +229,16 @@ export function CreateBook(props: {
                     onClick={() => {
                       window
                         .showDirectoryPicker({ mode: 'readwrite' })
-                        .then((h) => {
+                        .then(async (h) => {
                           dirHanndle.current = h
-                          setState({ folderName: h.name })
+                          const settings = await getSettings()
+                          if (settings.id) {
+                            form.setFieldValue('id', settings.id)
+                          }
+                          if (settings.name) {
+                            form.setFieldValue('name', settings.name)
+                          }
+                          setState({ folderName: h.name, settings: settings || {} })
                         })
                     }}
                   >
