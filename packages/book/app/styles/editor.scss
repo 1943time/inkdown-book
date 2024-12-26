@@ -1,4 +1,4 @@
-@import 'color';
+@use 'color' as c;
 :root {
   --md-text-code: #c9def1;
   --md-link: #38bdf8;

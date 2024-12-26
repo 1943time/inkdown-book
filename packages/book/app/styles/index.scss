@@ -1,8 +1,9 @@
+@use "sass:meta";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import 'font.scss';
-@import 'editor.scss';
+@include meta.load-css('font.scss');
+@include meta.load-css('editor.scss');
 
 /* html {
   font-family: "Ubuntu", serif;

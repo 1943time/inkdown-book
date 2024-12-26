@@ -51,7 +51,8 @@ export function CreateBook(props: {
             name,
             md
           })
-        } else {
+        }
+        if (handle.kind === 'file') {
           filesMap.current.set([...parentPath, name].join('/'), handle)
         }
       }
@@ -66,45 +67,86 @@ export function CreateBook(props: {
       const file = await json.getFile()
       const text = await file.text()
       return JSON.parse(text)
-    } catch(e) {
+    } catch (e) {
       return null
     }
   }, [])
-  const getFiles = useCallback(async (data: {
-    id: string
-    name: string
-  }):Promise<Tree[]> => {
-    return new Promise((resolve, reject) => {
-      readDir(dirHanndle.current!).then(res => {
-        if (!state().settings.id) {
-          Modal.confirm({
-            title: 'Note',
-            content: 'There is no inkdown/settings.json file in this folder. Should it be generated automatically?',
-            onCancel: reject,
-            onOk: async () => {
-              const dir = await dirHanndle.current!.getDirectoryHandle('.inkdown', {create: true})
-              const json = await dir.getFileHandle('settings.json', {create: true})
-              const text = await (await json.getFile()).text()
-              const settings = JSON.parse(text || '{}')
-              settings.name = data.name
-              settings.id = data.id
-              const writer = await json.createWritable()
-              writer.write(JSON.stringify(settings))
-              writer.close()
+
+  const getMapBySettings = useCallback(async (docs: any[], parentPath: string[] = []) => {
+    const tree: Tree[]  = []
+    for (const item of docs) {
+      if (item.path) {
+        const path = [...parentPath, item.path.replace(/^\/+/, '')].join('/')
+        const file = filesMap.current.get(path)
+        if (!file) {
+          console.log('path', path, filesMap.current);
+          message.error(`The path ${item.path} does not exist`)
+          throw new Error()
+        }
+        tree.push({
+          name: item.name,
+          md: await file.getFile().then(file => file.text())
+        })
+      } else if (item.children) {
+        tree.push({
+          name: item.name,
+          children: await getMapBySettings(item.children, [...parentPath, item.name])
+        })
+      }
+    }
+    return tree
+  }, [])
+  const getFiles = useCallback(
+    async (data: { id: string; name: string }): Promise<Tree[]> => {
+      return new Promise((resolve, reject) => {
+        readDir(dirHanndle.current!).then(async (res) => {
+          if (!state().settings.id) {
+            Modal.confirm({
+              title: 'Note',
+              content:
+                'There is no inkdown/settings.json file in this folder. Should it be generated automatically?',
+              onCancel: () => reject(),
+              onOk: async () => {
+                const dir = await dirHanndle.current!.getDirectoryHandle(
+                  '.inkdown',
+                  { create: true }
+                )
+                const json = await dir.getFileHandle('settings.json', {
+                  create: true
+                })
+                const text = await (await json.getFile()).text()
+                const settings = JSON.parse(text || '{}')
+                settings.name = data.name
+                settings.id = data.id
+                const writer = await json.createWritable()
+                writer.write(JSON.stringify(settings, null, 2))
+                writer.close()
+                resolve(res)
+              }
+            })
+          } else {
+            if (state().settings.docs && state().settings.docs instanceof Array) {
+              const tree = await getMapBySettings(state().settings.docs)
+              console.log('tree', tree)
+              
+              resolve(tree)
+            } else {
               resolve(res)
             }
-          })
-        } else {
-          resolve(res)
-        }
+          }
+        })
       })
-    })
-  }, [])
+    },
+    []
+  )
   const createBook = useCallback(() => {
     form.validateFields().then(async (v) => {
+      const settings = await getSettings()
+      if (settings) {
+        setState({settings})
+      }
+      const tree = await getFiles(v)
       try {
-        const tree = await getFiles(v)
-        getSettings()
         const client = new IApi({
           url: '',
           getFileData: async (path: string) => {
@@ -154,10 +196,11 @@ export function CreateBook(props: {
   useEffect(() => {
     if (props.open) {
       if (props.bookId) {
-        localdb.book.get(props.bookId!).then((res) => {
+        localdb.book.get(props.bookId!).then(async (res) => {
           if (res) {
-            setState({ folderName: res.handle.name })
             dirHanndle.current = res.handle
+            const settings = await getSettings()
+            setState({ folderName: res.handle.name, settings: settings || {} })
           }
         })
         api.getBook
@@ -189,18 +232,6 @@ export function CreateBook(props: {
       {contextHolder}
       <Form layout={'vertical'} form={form}>
         <Form.Item
-          label={'ID'}
-          name={'id'}
-          tooltip={
-            'The id determines the access path of the url. If the id conflicts, the content will be overwritten.'
-          }
-        >
-          <Input max={50} />
-        </Form.Item>
-        <Form.Item label={'Name'} name={'name'}>
-          <Input maxLength={100} />
-        </Form.Item>
-        <Form.Item
           label={'Data Source'}
           tooltip={
             'Can also upload data via vscode and inkdown, please see the documentation for details.'
@@ -220,11 +251,19 @@ export function CreateBook(props: {
             </Radio>
           </Radio.Group>
         </Form.Item>
-        <Form.Item shouldUpdate={(pre, cur) => pre.mode !== cur.mode} noStyle={true}>
+        <Form.Item
+          shouldUpdate={(pre, cur) => pre.mode !== cur.mode}
+          noStyle={true}
+        >
           {() => (
             <>
               {form.getFieldValue('mode') === 'manual' && (
-                <Form.Item label={'Select Folder'} tooltip={'Clear browser history or folder is moved, need to reselect'}>
+                <Form.Item
+                  label={'Select Folder'}
+                  tooltip={
+                    'Clear browser history or folder is moved, need to reselect'
+                  }
+                >
                   <Button
                     onClick={() => {
                       window
@@ -238,7 +277,10 @@ export function CreateBook(props: {
                           if (settings.name) {
                             form.setFieldValue('name', settings.name)
                           }
-                          setState({ folderName: h.name, settings: settings || {} })
+                          setState({
+                            folderName: h.name,
+                            settings: settings || {}
+                          })
                         })
                     }}
                   >
@@ -249,8 +291,45 @@ export function CreateBook(props: {
                   </span>
                 </Form.Item>
               )}
+              {form.getFieldValue('mode') === 'github' && (
+                <>
+                  <Form.Item label={'Repository'} required={true}>
+                    <div className={'flex justify-between space-x-3'}>
+                      <Form.Item noStyle={true} name={'owner'}>
+                        <Input placeholder={'Owner'} />
+                      </Form.Item>
+                      <Form.Item noStyle={true}>
+                        <Input placeholder={'Repo'} />
+                      </Form.Item>
+                      <Form.Item noStyle={true}>
+                        <Input placeholder={'Branch'} />
+                      </Form.Item>
+                    </div>
+                  </Form.Item>
+                  <Form.Item
+                    label={'Token'}
+                    name={'token'}
+                    rules={[{ required: true }]}
+                  >
+                    <Input />
+                  </Form.Item>
+                </>
+              )}
             </>
           )}
+        </Form.Item>
+        <Form.Item
+          label={'ID'}
+          name={'id'}
+          rules={[{ required: true }]}
+          tooltip={
+            'The id determines the access path of the url. If the id conflicts, the content will be overwritten.'
+          }
+        >
+          <Input max={50} />
+        </Form.Item>
+        <Form.Item label={'Name'} name={'name'} rules={[{ required: true }]}>
+          <Input maxLength={100} />
         </Form.Item>
         <div className={'flex space-x-5 pt-5'}>
           <Button block={true} onClick={props.onClose}>
