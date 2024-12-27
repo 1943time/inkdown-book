@@ -189,6 +189,7 @@ export class IApi {
       removeDocs: removeDocs,
       removeFiles: removeFiles,
       bookId: id,
+      name,
       map: JSON.stringify(map),
       texts: JSON.stringify(textData)
     })

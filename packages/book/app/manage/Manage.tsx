@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react'
-import { ClientOnly } from './ClientOnly'
+import { ClientOnly } from '../ui/ClientOnly'
 import { api } from '../.client/api'
 import { useGetSetState } from 'react-use'
 import { Button, Modal, Table } from 'antd'

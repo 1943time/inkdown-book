@@ -148,6 +148,7 @@ export const appRouter = router({
         map: z.string(),
         bookId: z.string(),
         texts: z.string(),
+        name: z.string(),
         removeFiles: z.string().array(),
         add: z
           .object({
@@ -189,6 +190,7 @@ export const appRouter = router({
           where: { id: input.bookId },
           data: {
             map: input.map,
+            name: input.name,
             texts: input.texts
           }
         })

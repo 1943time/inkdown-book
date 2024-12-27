@@ -60,9 +60,6 @@ export function DirectoryFrame(props: {
           >
             <Directory map={props.map} level={0} />
           </div>
-          <div>
-            space
-          </div>
         </div>
       </div>
       {state.visible && (

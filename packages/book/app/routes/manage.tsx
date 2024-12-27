@@ -1,5 +1,5 @@
 import { ClientOnly } from '../ui/ClientOnly'
-import { Manage } from '../ui/Manage'
+import { Manage } from '../manage/Manage'
 
 export default function() {
   return (

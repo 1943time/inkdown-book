@@ -127,8 +127,6 @@ export function CreateBook(props: {
           } else {
             if (state().settings.docs && state().settings.docs instanceof Array) {
               const tree = await getMapBySettings(state().settings.docs)
-              console.log('tree', tree)
-              
               resolve(tree)
             } else {
               resolve(res)
