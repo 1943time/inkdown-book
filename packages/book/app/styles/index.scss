@@ -81,7 +81,7 @@ h1.heading:first-child {
     h4,
     h5 {
       .anchor {
-        @apply lg:-top-4;
+        @apply lg:-top-16;
       }
     }
   }
@@ -131,7 +131,7 @@ h1.heading:first-child {
 .leading-container {
   right: max(0px, calc((100vw - 780px - 280px) / 2));
   transition-property: transform, opacity;
-  @apply top-0 h-screen fixed duration-200 w-[280px] overflow-hidden hidden;
+  @apply top-0 h-screen fixed duration-200 w-[280px] overflow-hidden hidden pl-4;
   &:after {
     content: '';
     display: block;
@@ -154,7 +154,7 @@ h1.heading:first-child {
 }
 .leading {
   width: 280px;
-  padding-top: 80px;
+  padding-top: 100px;
   height: 100%;
   &::-webkit-scrollbar {
     display: none;
@@ -165,14 +165,14 @@ h1.heading:first-child {
   }
 
   &-list {
-    @apply dark:text-white/60 text-black/60 text-sm leading-5 flex-1;
+    @apply dark:text-white/60 text-black/60 text-sm leading-5 flex-1 border-l border-gray-200 relative dark:border-white/10 pl-3;
   }
 
   &-item {
     @apply cursor-pointer py-1 block;
     @apply dark:hover:text-white/90 hover:text-black/90;
     &.active {
-      @apply text-black font-semibold dark:text-white;
+      @apply text-black font-semibold dark:text-white relative;
     }
   }
 }
@@ -379,7 +379,7 @@ td {
 }
 
 .header-link{
-  @apply text-sm text-black/60 relative leading-8 dark:text-white/70;
+  @apply text-sm text-black/60 relative leading-8 dark:text-white/70 max-w-48 truncate ;
   .link{
     @apply hover:text-blue-500 duration-200 text-black/60 dark:text-white/70 dark:hover:text-blue-500;
   }

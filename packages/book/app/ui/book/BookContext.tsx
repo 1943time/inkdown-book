@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useNavigate, useParams } from '@remix-run/react'
 import { BsContext } from '../BsContext'
 import { TreeContext } from '../../utils/ctx'
+import { api } from '../../.client/api'
 export const getOffsetBody = (el: HTMLElement) => {
   let top = 0
   while (el.offsetParent) {
@@ -66,26 +67,25 @@ export function BookContext(props: {
     if (cache) {
       cacheData = JSON.parse(cache)
     }
-    // get(`${params.space ? `/${params.space}` : ''}/data`, {
-    //   mode: 'textMap',
-    //   path: params.path as string,
-    //   updated: String(cacheData.time)
-    // }).then(async (response) => {
-    //   const res = await response.json()
-    //   if (res.data) {
-    //     localStorage.setItem(
-    //       cacheKey,
-    //       JSON.stringify({
-    //         texts: res.data.texts || [],
-    //         time: res.data.updated
-    //       })
-    //     )
-    //     setState({ textMap: JSON.parse(res.data.texts || '[]') })
-    //   } else {
-    //     setState({ textMap: JSON.parse(cacheData.texts || '[]') })
-    //   }
-    // })
+    api.getBookTexts.query({
+      bookId: params.id as string,
+      updated: cacheData.time
+    }).then(async (res) => {
+      if (res.texts) {
+        localStorage.setItem(
+          cacheKey,
+          JSON.stringify({
+            texts: res.texts || [],
+            time: res.updated
+          })
+        )
+        setState({ textMap: JSON.parse(res.texts || '[]') })
+      } else {
+        setState({ textMap: JSON.parse(cacheData.texts || '[]') })
+      }
+    })
   }, [])
+  
   const docs = useMemo(() => {
     let docs: any[] = []
     const stack = props.map.slice()
@@ -126,21 +126,7 @@ export function BookContext(props: {
   const toPosition = useCallback((position?: string) => {
     curDom.current?.classList.remove('high-block')
     clearTimeout(timer.current)
-    if (!position || position === 'top') {
-      const head = document.querySelector('.content')
-        ?.children[0] as HTMLElement
-      if (head) {
-        window.scroll({
-          top: 0,
-          behavior: 'auto'
-        })
-        head.classList.add('high-block')
-        curDom.current = head
-        timer.current = window.setTimeout(() => {
-          head.classList.remove('high-block')
-        }, 2000)
-      }
-    } else {
+    if (position) {
       const target = document.querySelector(
         `[data-index="${position}"]`
       ) as HTMLElement

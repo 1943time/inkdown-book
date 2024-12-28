@@ -56,6 +56,7 @@ export function Search({ mode }: { mode: 'dir' | 'window' }) {
       state().keyword.replace(/[*.?+$^\[]\(\)\{}\|\/]/g, '\\$&'),
       'gi'
     )
+    
     const result = tree.textMap.filter((d) => {
         return d.texts.some((t) => t.text.toLowerCase().includes(key))
       })
@@ -109,12 +110,12 @@ export function Search({ mode }: { mode: 'dir' | 'window' }) {
         setState({ searchFocus: false })
       }
       if (paramsRef.current['*'] === path) {
-        tree.toPosition(options.position || 'top')
+        tree.toPosition(options.position)
       } else {
-        navagate(`${params.space ? `/${params.space}` : ''}/book/${params.path}/${path}`)
+        navagate(`/doc/${params.id}/${path}`)
         tree.selectPath(path)
         tree.setState({
-          position: options.position || 'top'
+          position: options.position
         })
       }
       ctx.setState!({ openSearch: false })
@@ -150,7 +151,7 @@ export function Search({ mode }: { mode: 'dir' | 'window' }) {
         }
       >
         <div
-          className={`text-sm relative h-8 ${mode === 'window' ? '' : 'border rounded-lg duration-200'} ${
+          className={`text-sm relative h-10 ${mode === 'window' ? '' : 'border rounded-lg duration-200'} ${
             state().searchFocus
               ? 'dark:border-gray-200/50 border-gray-400'
               : 'dark:border-gray-200/20 border-gray-300'

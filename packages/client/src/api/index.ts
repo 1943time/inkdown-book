@@ -119,7 +119,7 @@ export class IApi {
       name
     })
     
-    const remoteFilesSet = new Set(files.map((f) => f.path))
+    const remoteFilesMap = new Map(files.map((f) => [f.path, f.name]))
     const remoteDocsMap = new Map(docs.map((d) => [d.path, d]))
     const add: { path: string; schema: string; sha: string }[] = []
     const addFiles = new Set<string>()
@@ -131,7 +131,7 @@ export class IApi {
       textData.push({
         path: path,
         name,
-        texts: JSON.stringify(item.texts)
+        texts: item.texts
       })
       
       for (const file of item.medias) {
@@ -140,7 +140,7 @@ export class IApi {
             ? file.url
             : pathPkg.join(path, '..', file.url)
           addFiles.add(filePath)
-          if (!remoteFilesSet.has(filePath)) {
+          if (!remoteFilesMap.has(filePath)) {
             const data = await this.getFileData(filePath)
             if (data && data.size < 1024 * 1024 * 30) {
               try {
@@ -157,6 +157,8 @@ export class IApi {
                 console.error('upload', e)
               }
             }
+          } else {
+            file.url = `/assets/${remoteFilesMap.get(filePath)!}`
           }
         }
       }
@@ -179,7 +181,7 @@ export class IApi {
       })
     }
 
-    const removeFiles = Array.from(remoteFilesSet).filter(
+    const removeFiles = Array.from(remoteFilesMap.keys()).filter(
       (p) => !addFiles.has(p)
     )
 

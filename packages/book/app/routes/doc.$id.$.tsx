@@ -13,6 +13,10 @@ import { useContext, useEffect } from 'react'
 import { DocCtx, TreeContext } from '../utils/ctx'
 import { db } from '../.server/prisma'
 
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  return [{ title: '' }]
+}
+
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const doc = await db.doc.findUnique({
     where: {path_bookId: {bookId: params.id!, path: params['*']!}},

@@ -4,7 +4,6 @@ import { Media } from './Media'
 import { ALink } from './Link'
 import { Link } from '@remix-run/react'
 import Katex from './Katex'
-import { Attachment } from './Attachment'
 import { Checkbox } from '../CheckBox'
 import { escapeScript, getNodeString } from '../../utils/common'
 
@@ -163,7 +162,6 @@ function Render(
               </td>
             )}
             {s.type === 'media' && <Media node={s} />}
-            {s.type === 'attach' && <Attachment node={s} path={path} />}
             {s.type === 'code' && <CodeContainer node={s} path={path} />}
             {s.type === 'inline-katex' && (
               <Katex node={{ ...s, code: getNodeString(s) }} inline={true} />

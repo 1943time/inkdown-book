@@ -26,7 +26,7 @@ export const appRouter = router({
         })
         const files = await db.file.findMany({
           where: { bookId: input.bookId },
-          select: { path: true }
+          select: { path: true, name: true }
         })
         return { docs: docs, files, id: input.bookId }
       } else {
@@ -107,7 +107,7 @@ export const appRouter = router({
     .input(
       z.object({
         bookId: z.string(),
-        updated: z.string()
+        updated: z.number()
       })
     )
     .query(async ({ input }) => {
@@ -118,10 +118,11 @@ export const appRouter = router({
       if (record) {
         return {
           texts:
-            record.updated.valueOf() === +input.updated ? null : record.texts
+            record.updated.valueOf() === input.updated ? null : record.texts,
+          updated: record.updated.valueOf()
         }
       }
-      return { text: null }
+      return { texts: null }
     }),
   getBook: procedure
     .input(
@@ -160,7 +161,6 @@ export const appRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      console.log('input', input)
       return await db.$transaction(async (t) => {
         if (input.removeDocs.length) {
           await t.doc.deleteMany({
