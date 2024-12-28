@@ -4,11 +4,11 @@ import { useSetState } from 'react-use'
 import { Link, useParams } from '@remix-run/react'
 import { Icon } from '@iconify/react'
 import { ThemeSwitch } from '../ThemeSwitch'
-import { Search } from './Search'
-import IBook from '../icons/IBook'
 import { DocCtx, TreeContext } from '../../utils/ctx'
 import { useClientLayoutEffect } from '../../utils/common'
 import { isDark } from '../../.client/utils'
+import IDark from '../icons/Dark'
+import ILight from '../icons/Light'
 export function DirectoryFrame(props: {
   map: any[]
   name: string
@@ -60,6 +60,18 @@ export function DirectoryFrame(props: {
           >
             <Directory map={props.map} level={0} />
           </div>
+          <div className={'flex justify-end items-center h-12'}>
+          <div
+            className={
+              'h-7 w-7 flex lg:hidden items-center justify-center rounded hover:bg-black/5 ml-2 cursor-pointer dark:hover:bg-white/10 duration-200 select-none'
+            }
+            onClick={() => {
+              ctx.setTheme(ctx.theme === 'dark' ? 'light' : 'dark')
+            }}
+          >
+            {ctx.theme === 'dark' ? <IDark /> : <ILight />}
+          </div>
+          </div>
         </div>
       </div>
       {state.visible && (
@@ -101,7 +113,7 @@ function Directory({ map, level }: { map: any[]; level: number }) {
             >
               <span className={'mr-1'}>{d.name}</span>
               <ArrowRight
-                className={`w-[14px] h-[14px] flex-shrink-0 text-gray-400 dark:group-hover:text-gray-100 group-hover:text-gray-600 duration-200 ${
+                className={`w-[12px] h-[12px] flex-shrink-0 text-gray-400 dark:group-hover:text-gray-100 group-hover:text-gray-600 duration-200 ${
                   isOpen(d.path) ? 'rotate-90' : ''
                 }`}
               />

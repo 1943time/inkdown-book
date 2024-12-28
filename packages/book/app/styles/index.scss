@@ -54,7 +54,7 @@ h1.heading:first-child {
 }
 
 .header {
-  @apply fixed left-0 top-0 w-full h-14 flex justify-center z-50 border-b dark:bg-[rgba(30,30,31,.8)] dark:border-white/5 border-black/5 bg-[rgba(248,248,248,.8)] backdrop-blur-md;
+  @apply fixed left-0 top-0 w-full lg:h-14 h-12 flex justify-center z-50 border-b dark:bg-[rgba(30,30,31,.8)] dark:border-white/5 border-black/5 bg-[rgba(248,248,248,.8)] backdrop-blur-md;
 }
 
 .header-content {
@@ -378,6 +378,9 @@ td {
   transform: rotate(-45deg) translate(5px, -5px);
 }
 
+.menu  {
+  @apply shadow shadow-black/20 bg-white dark:bg-[#1e1e1f] dark:border dark:border-white/10 dark:shadow-none;
+}
 .header-link{
   @apply text-sm text-black/60 relative leading-8 dark:text-white/70 max-w-48 truncate ;
   .link{
@@ -385,7 +388,7 @@ td {
   }
   .link-menu {
     display: none;
-    @apply absolute top-full left-0 flex-col p-2 rounded-lg shadow shadow-black/20 bg-white dark:bg-[#1e1e1f] space-y-1 min-w-52 dark:border dark:border-white/10 dark:shadow-none;
+    @apply absolute top-full left-0 flex-col p-2 rounded-lg space-y-1 min-w-52;
     a{
       @apply leading-8 px-2.5 hover:bg-black/5 rounded text-black/80 dark:text-white dark:hover:bg-white/5;
     }

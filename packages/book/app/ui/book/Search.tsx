@@ -193,7 +193,7 @@ export function Search({ mode }: { mode: 'dir' | 'window' }) {
           />
           <div
             className={
-              'p-1 flex lg:hidden dark:text-gray-400 absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 duration-200 cursor-pointer rounded items-center justify-center'
+              'p-1 flex dark:text-gray-400 absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 duration-200 cursor-pointer rounded items-center justify-center'
             }
             onClick={() => {
               ctx.setState({
