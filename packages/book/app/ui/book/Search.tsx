@@ -6,6 +6,7 @@ import { Icon } from '@iconify/react'
 import { ISearch } from '../icons/ISearch'
 import { encodeHtml } from '../../utils/common'
 import { DocCtx, TreeContext } from '../../utils/ctx'
+import {isHotkey} from 'is-hotkey'
 
 const highlight = (text: string, key: RegExp) => {
   text = encodeHtml(text)
@@ -129,6 +130,16 @@ export function Search({ mode }: { mode: 'dir' | 'window' }) {
       }, 30)
     }
   }, [ctx.openSearch])
+  useEffect(() => {
+    window.addEventListener('keydown', e => {
+      if (isHotkey('mod+k', e)) {
+        ctx.setState({openSearch: true})
+      }
+      if (isHotkey('esc', e)) {
+        ctx.setState!({ openSearch: false })
+      }
+    })
+  }, [])
   if (!ctx.openSearch && mode === 'window') return null
   return (
     <div
