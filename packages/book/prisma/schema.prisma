@@ -18,7 +18,7 @@ model Book {
   files    File[]
   docs     Doc[]
   map      String @default("[]")
-  settings String?
+  settings String @default("{}")
   texts    String @default("[]")
   created  DateTime @default(now())
   updated  DateTime @updatedAt

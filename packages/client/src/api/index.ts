@@ -111,7 +111,7 @@ export class IApi {
     }
     return docs
   }
-  async syncBook(id: string, name: string, data: Tree[]) {
+  async syncBook({id, name, data, settings}: {id: string, name: string, data: Tree[], settings: Record<string, any>}) {
     this.docMap.clear()
     const { docs, files } = await this.$t.getBookDetails.query({
       bookId: id,
@@ -193,7 +193,8 @@ export class IApi {
       bookId: id,
       name,
       map: JSON.stringify(map),
-      texts: JSON.stringify(textData)
+      texts: JSON.stringify(textData),
+      settings: JSON.stringify(settings)
     })
   }
   getBook(id: string) {

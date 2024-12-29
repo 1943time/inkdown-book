@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react'
+import { Fragment, useContext, useEffect } from 'react'
 import { Icon } from '@iconify/react'
 import { Link } from '@remix-run/react'
 import { DocCtx } from '../utils/ctx'
@@ -11,17 +11,21 @@ import { IMore } from './icons/IMore'
 import { useGetSetState } from 'react-use'
 export function Header(props: {
   title?: string
-  siteLogo?: string | null
-  siteLogoLink?: string | null
+  settings: Record<string, any>
 }) {
   const ctx = useContext(DocCtx)
   const [state, setState] = useGetSetState({
     openLinksMenu: false
   })
   useEffect(() => {
-    window.addEventListener('click', e => {
-      if (state().openLinksMenu && !document.querySelector('.m-link-menu')?.contains(e.target as HTMLElement)) {
-        setState({openLinksMenu: false})
+    window.addEventListener('click', (e) => {
+      if (
+        state().openLinksMenu &&
+        !document
+          .querySelector('.m-link-menu')
+          ?.contains(e.target as HTMLElement)
+      ) {
+        setState({ openLinksMenu: false })
       }
     })
   }, [])
@@ -47,30 +51,91 @@ export function Header(props: {
           </span>
         </div>
         <div className={'flex items-center'}>
-          <div className={'mr-7 space-x-7 items-center hidden md:flex'}>
-            {/* <div className={'header-link'}>
-              <span className={'flex items-center space-x-2 cursor-pointer link'}>Support <Icon icon={'ep:arrow-down-bold'} className={'arrow'}/></span>
-              <div className={'link-menu menu'}>
-                <Link to={''}>Blog</Link>
-                <Link to={''}>Product</Link>
+          {!!props.settings.nav?.length && (
+            <>
+              <div className={'mr-7 space-x-7 items-center hidden md:flex'}>
+                {props.settings.nav.map((n: any, i: number) => (
+                  <Fragment key={i}>
+                    {!!n.items ? (
+                      <div className={'header-link'}>
+                        <span
+                          className={
+                            'flex items-center space-x-2 cursor-pointer link'
+                          }
+                        >
+                          {n.text}{' '}
+                          <Icon
+                            icon={'ep:arrow-down-bold'}
+                            className={'arrow'}
+                          />
+                        </span>
+                        <div className={'link-menu menu'}>
+                          {n.items.map((item: any, i: number) => 
+                            <Link to={item.link} key={i} target={'_blank'} className={'block'}>
+                              {item.text}
+                            </Link>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className={'header-link'}>
+                        <Link to={n.link} className={'link'} target={'_blank'}>
+                          {n.text}
+                        </Link>
+                      </div>
+                    )}
+                  </Fragment>
+                ))}
               </div>
-            </div> */}
-            <div className={'header-link'}>
-              <Link to={''} className={'link'}>
-                Vs Code
-              </Link>
-            </div>
-            <div className={'header-link'}>
-              <Link to={''} className={'link'}>
-                Inkdown Editor
-              </Link>
-            </div>
-            <div className={'header-link'}>
-              <Link to={''} className={'link'}>
-                Github
-              </Link>
-            </div>
-          </div>
+              <div
+                className={'flex items-center relative m-link-menu md:hidden'}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setState({ openLinksMenu: !state().openLinksMenu })
+                }}
+              >
+                <IMore className={'text-xl mr-1'} />
+                <Icon
+                  icon={'ep:arrow-down-bold'}
+                  className={`text-xs scale-90 duration-200 ${
+                    state().openLinksMenu ? 'rotate-180' : ''
+                  }`}
+                />
+                <div
+                  className={`w-52 absolute top-8 -right-5 menu px-2 rounded-lg py-2.5 space-y-1 ${
+                    state().openLinksMenu ? '' : 'hidden'
+                  }`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {props.settings.nav.map((n: any, i: number) => (
+                    <Fragment key={i}>
+                      {!!n.items ? (
+                        n.items.map((item: any, j: number) => (
+                          <Fragment key={j}>
+                            {i !== 0 && j === 0 &&
+                              <div className={'h-[1px] w-full bg-gray-200 my-1.5 dark:bg-white/10'}/>
+                            }
+                            <Link
+                            to={item.link}
+                            key={j}
+                            target={'_blank'}
+                            className={`block text-sm py-0.5 pl-2`}
+                          >
+                            {item.text}
+                          </Link>
+                          </Fragment>
+                        ))
+                      ) : (
+                        <Link to={n.link} target={'_blank'} className={'block text-sm py-0.5 pl-2'}>
+                          {n.text}
+                        </Link>
+                      )}
+                    </Fragment>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
           <div
             className={
               'hidden lg:block items-center relative w-56 rounded-lg bg-white dark:bg-white/5 h-8 shadow shadow-gray-600/30 duration-200 hover:shadow-md hover:shadow-black/20 dark:shadow-black/20 dark:hover:shadow-black/80 dark:hover:shadow-md'
@@ -103,26 +168,6 @@ export function Header(props: {
                 <span className={`ml-1  ${isMac ? 'scale-90' : ''}`}>K</span>
               </div>
             </ClientOnly>
-          </div>
-          <div 
-            className={'flex items-center relative m-link-menu md:hidden'}
-            onClick={(e) => {
-              e.stopPropagation()
-              setState({openLinksMenu: !state().openLinksMenu})
-            }}
-          >
-            <IMore className={'text-xl mr-1'}/>
-            <Icon icon={'ep:arrow-down-bold'} className={`text-xs scale-90 duration-200 ${state().openLinksMenu ? 'rotate-180' : ''}`} />
-            <div 
-              className={`w-52 absolute top-8 -right-5 menu rounded-lg px-2 py-2.5 *:text-sm *:pl-2 *:py-0.5 space-y-1 ${state().openLinksMenu ? '' : 'hidden'}`}
-              onClick={e => e.stopPropagation()}
-            >
-              <div>
-                Github
-              </div>
-              <div>Vs Code</div>
-              <div>Inkdown Editor</div>
-            </div>
           </div>
           <div
             className={

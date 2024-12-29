@@ -130,17 +130,25 @@ export const appRouter = router({
         id: z.string()
       })
     )
-    .query(({ input }) => {
-      return db.book.findUnique({
+    .query(async ({ input }) => {
+      const data = await db.book.findUnique({
         where: { id: input.id },
         select: {
           id: true,
           name: true,
           updated: true,
           created: true,
+          settings: true,
           lasteUpdateMode: true
         }
       })
+      if (!data) {
+        return null
+      }
+      return {
+        ...data,
+        settings: JSON.parse(data.settings)
+      }
     }),
   syncBookData: procedure
     .input(
@@ -151,6 +159,7 @@ export const appRouter = router({
         texts: z.string(),
         name: z.string(),
         removeFiles: z.string().array(),
+        settings: z.string(),
         add: z
           .object({
             path: z.string(),
@@ -191,7 +200,8 @@ export const appRouter = router({
           data: {
             map: input.map,
             name: input.name,
-            texts: input.texts
+            texts: input.texts,
+            settings: input.settings
           }
         })
         if (input.removeFiles.length) {

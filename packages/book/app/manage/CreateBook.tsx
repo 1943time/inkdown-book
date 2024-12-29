@@ -72,30 +72,35 @@ export function CreateBook(props: {
     }
   }, [])
 
-  const getMapBySettings = useCallback(async (docs: any[], parentPath: string[] = []) => {
-    const tree: Tree[]  = []
-    for (const item of docs) {
-      if (item.path) {
-        const path = [...parentPath, item.path.replace(/^\/+/, '')].join('/')
-        const file = filesMap.current.get(path)
-        if (!file) {
-          console.log('path', path, filesMap.current);
-          message.error(`The path ${item.path} does not exist`)
-          throw new Error()
+  const getMapBySettings = useCallback(
+    async (docs: any[], parentPath: string[] = []) => {
+      const tree: Tree[] = []
+      for (const item of docs) {
+        if (item.path) {
+          const path = [...parentPath, item.path.replace(/^\/+/, '')].join('/')
+          const file = filesMap.current.get(path)
+          if (!file) {
+            message.error(`The path ${item.path} does not exist`)
+            throw new Error()
+          }
+          tree.push({
+            name: item.name,
+            md: await file.getFile().then((file) => file.text())
+          })
+        } else if (item.children) {
+          tree.push({
+            name: item.name,
+            children: await getMapBySettings(item.children, [
+              ...parentPath,
+              item.name
+            ])
+          })
         }
-        tree.push({
-          name: item.name,
-          md: await file.getFile().then(file => file.text())
-        })
-      } else if (item.children) {
-        tree.push({
-          name: item.name,
-          children: await getMapBySettings(item.children, [...parentPath, item.name])
-        })
       }
-    }
-    return tree
-  }, [])
+      return tree
+    },
+    []
+  )
   const getFiles = useCallback(
     async (data: { id: string; name: string }): Promise<Tree[]> => {
       return new Promise((resolve, reject) => {
@@ -125,7 +130,10 @@ export function CreateBook(props: {
               }
             })
           } else {
-            if (state().settings.docs && state().settings.docs instanceof Array) {
+            if (
+              state().settings.docs &&
+              state().settings.docs instanceof Array
+            ) {
               const tree = await getMapBySettings(state().settings.docs)
               resolve(tree)
             } else {
@@ -141,7 +149,7 @@ export function CreateBook(props: {
     form.validateFields().then(async (v) => {
       const settings = await getSettings()
       if (settings) {
-        setState({settings})
+        setState({ settings })
       }
       const tree = await getFiles(v)
       try {
@@ -152,7 +160,14 @@ export function CreateBook(props: {
           },
           mode: 'manual'
         })
-        await client.syncBook(v.id, v.name, tree)
+        await client.syncBook({
+          id: v.id,
+          name: v.name,
+          data: tree,
+          settings: {
+            nav: settings.nav
+          }
+        })
         localdb.book.put(
           {
             bookId: v.id,

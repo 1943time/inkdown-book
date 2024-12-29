@@ -382,14 +382,14 @@ td {
   @apply shadow shadow-black/20 bg-white dark:bg-[#1e1e1f] dark:border dark:border-white/10 dark:shadow-none;
 }
 .header-link{
-  @apply text-sm text-black/60 relative leading-8 dark:text-white/70 max-w-48 truncate ;
+  @apply text-sm text-black/60 relative leading-8 dark:text-white/70 max-w-48 ;
   .link{
     @apply hover:text-blue-500 duration-200 text-black/60 dark:text-white/70 dark:hover:text-blue-500;
   }
   .link-menu {
     display: none;
-    @apply absolute top-full left-0 flex-col p-2 rounded-lg space-y-1 min-w-52;
-    a{
+    @apply absolute top-full left-0 flex-col p-2 rounded-lg space-y-1 min-w-52 z-10;
+    > a{
       @apply leading-8 px-2.5 hover:bg-black/5 rounded text-black/80 dark:text-white dark:hover:bg-white/5;
     }
   }
