@@ -172,7 +172,7 @@ h1.heading:first-child {
     @apply cursor-pointer py-1 block;
     @apply dark:hover:text-white/90 hover:text-black/90;
     &.active {
-      @apply text-black font-semibold dark:text-white relative;
+      @apply text-black dark:text-white relative;
     }
   }
 }

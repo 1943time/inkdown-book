@@ -5,7 +5,24 @@ import { Prisma } from '@prisma/client'
 import { join } from 'node:path'
 import { existsSync } from 'node:fs'
 import { unlink } from 'node:fs/promises'
+import jwt from 'jsonwebtoken'
 export const appRouter = router({
+  getEnv: procedure.query(() => {
+    return {
+      ACCESS_KEY_ID: process.env.ACCESS_KEY_ID,
+      ACCESS_KEY_SECRET: process.env.ACCESS_KEY_SECRET
+    }
+  }),
+  login: procedure.input(z.object({
+    id: z.string(),
+    secret: z.string()
+  })).mutation(async ({input}) => {
+    if (input.id === process.env.ACCESS_KEY_ID && input.secret === process.env.ACCESS_KEY_SECRET) {
+      return {token: jwt.sign({logged: true}, `${input.id}:${input.secret}`, {expiresIn: '3650 days'})}
+    } else {
+      return {token: null}
+    }
+  }),
   getBookDetails: procedure
     .input(
       z.object({

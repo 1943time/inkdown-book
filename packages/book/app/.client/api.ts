@@ -1,13 +1,14 @@
 import { createTRPCClient, httpBatchLink } from '@trpc/client'
 import { AppRouter } from '../../model'
 import {message} from 'antd'
+
 export const api = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
       url: `/api`,
       async headers() {
         const headers: Record<string, string> = {}
-        const token = localStorage.getItem('mn-token')
+        const token = localStorage.getItem('inkdown-token')
         if (token) {
           headers['Authorization'] = `Bearer ${token}`
         }
@@ -27,7 +28,7 @@ export const api = createTRPCClient<AppRouter>({
               })
             }
             if (res.status === 401) {
-              location.href = '/login'
+              location.href = '/inkdown-login'
             }
           }
           return res

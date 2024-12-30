@@ -3,8 +3,6 @@ import { Leading } from '../ui/Leading'
 import { Highlight } from '../ui/render/Hihglight'
 import { LoaderFunctionArgs, MetaFunction } from '@remix-run/node'
 import {
-  ClientLoaderFunctionArgs,
-  redirect,
   useLoaderData, useParams
 } from '@remix-run/react'
 import { BackToFirst } from '../ui/book/Back'
@@ -31,7 +29,6 @@ export default function () {
   const params = useParams()
   const schema = JSON.parse(res?.schema || '[]')
   const tree = useContext(TreeContext)
-  const ctx = useContext(DocCtx)
   useEffect(() => {
     if (tree.position || tree.position === 'top') {
       setTimeout(() => {

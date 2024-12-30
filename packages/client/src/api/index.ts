@@ -1,6 +1,5 @@
 import { CreateTRPCClient, createTRPCClient, httpBatchLink } from '@trpc/client'
 import { AppRouter } from '../../../book/model'
-import { sha1 } from 'js-sha1'
 import { parseDetail } from '../parser/schema'
 import { isLink, nid, slugify } from '../utils'
 import pathPkg from 'path-browserify'
@@ -29,6 +28,7 @@ export class IApi {
   private options: {
     mode: Mode
     url: string
+    sha1: (data: any) => string
   }
   uploadFile(data: {
     name: string
@@ -54,12 +54,13 @@ export class IApi {
     const store = new Uint8Array(headerBytes.length + contentBytes.length)
     store.set(headerBytes)
     store.set(contentBytes, headerBytes.length)
-    return sha1(store)
+    return this.options.sha1(store)
   }
   constructor(options: {
     url: string
     getFileData: (path: string) => Promise<File | null>
     mode: Mode
+    sha1: (data: any) => string
   }) {
     options.url = options.url.replace(/\/+$/, '')
     this.$t = createTRPCClient<AppRouter>({
@@ -72,7 +73,8 @@ export class IApi {
     this.getFileData = options.getFileData
     this.options = {
       mode: options.mode,
-      url: options.url
+      url: options.url,
+      sha1: options.sha1
     }
   }
   private transformTree(data: Tree[], parentPath: string[] = []) {

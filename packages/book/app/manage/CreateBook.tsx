@@ -14,6 +14,7 @@ import { useGetSetState } from 'react-use'
 import { IApi } from '@inkdown/client'
 import { localdb } from '../.client/db'
 import { sortTree } from '../utils/common'
+import {sha1} from 'js-sha1'
 type Tree = {
   md?: string
   name: string
@@ -158,7 +159,8 @@ export function CreateBook(props: {
           getFileData: async (path: string) => {
             return filesMap.current.get(path)?.getFile() || null
           },
-          mode: 'manual'
+          mode: 'manual',
+          sha1
         })
         await client.syncBook({
           id: v.id,

@@ -1,17 +1,24 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { ClientOnly } from '../ui/ClientOnly'
 import { api } from '../.client/api'
 import { useGetSetState } from 'react-use'
-import { Button, Modal, Table } from 'antd'
+import { Button, ConfigProvider, Modal, Table, theme } from 'antd'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import dayjs from 'dayjs'
-import {BookOutlined} from '@ant-design/icons'
+import {
+  BookOutlined,
+  LogoutOutlined,
+  SettingOutlined
+} from '@ant-design/icons'
 import { CreateBook } from './CreateBook'
 import { localdb } from '../.client/db'
-import { Link } from '@remix-run/react'
+import { Link, useNavigate } from '@remix-run/react'
+import { useClientLayoutEffect } from '../utils/common'
+import { Settings } from './Settings'
 dayjs.extend(relativeTime)
 export function Manage() {
   const [modal, context] = Modal.useModal()
+  const navigate = useNavigate()
   const [state, setState] = useGetSetState({
     page: 1,
     pageSize: 10,
@@ -19,11 +26,14 @@ export function Manage() {
     loading: false,
     openCreateDialog: false,
     selectedBookId: '',
+    theme: '',
+    ready: false,
     sort: {
       field: 'created' as 'created' | 'updated',
       mode: 'desc' as 'asc' | 'desc'
     },
     total: 0,
+    openSettings: false,
     list: [] as {
       id: string
       name: string
@@ -32,6 +42,11 @@ export function Manage() {
       updated: string
     }[]
   })
+  const themeObject = useMemo(() => {
+    return state().theme === 'dark'
+      ? theme.darkAlgorithm
+      : theme.defaultAlgorithm
+  }, [state().theme])
   const getBooks = useCallback(() => {
     setState({ loading: true })
     api.getBooks
@@ -54,95 +69,168 @@ export function Manage() {
   useEffect(() => {
     getBooks()
   }, [])
+  useClientLayoutEffect(() => {
+    let theme = localStorage.getItem('theme')
+    if (!theme) {
+      theme = window.matchMedia && window.matchMedia('(prefers-color-scheme:dark)').matches  ? 'dark' : ''
+    }
+    setState({ theme: theme || '', ready: true })
+  }, [])
+  if (!state().ready) {
+    return null
+  }
   return (
     <ClientOnly>
-      {context}
-      <div className={'max-w-[1200px] mx-auto py-10 px-5'}>
-        <div className={'flex justify-between items-center mb-4'}>
-          <div className={'text-gray-800 text-xl font-medium'}>
-            Inkdown Book
-          </div>
-          <div>
-            <Button 
-              type={'primary'} icon={<BookOutlined />}
-              onClick={() => {
-                setState({selectedBookId: '', openCreateDialog: true})
-              }}
-            >
-              Create Book
-            </Button>
-          </div>
-        </div>
-        <Table
-          rowKey={'id'}
-          size={'middle'}
-          loading={state().loading}
-          dataSource={state().list}
-          pagination={{
-            pageSize: state().pageSize,
-            current: state().page,
-            total: state().total,
-            onChange: page => {
-              setState({page})
-              getBooks()
-            }
-          }}
-          columns={[
-            {
-              title: 'ID',
-              dataIndex: 'id',
-              render: v => <Link to={`/doc/${v}`} className={'underline'} target={'_blank'}>{v}</Link>
-            },
-            {
-              title: 'Name',
-              dataIndex: 'name'
-            },
-            {
-              title: 'Created',
-              dataIndex: 'created',
-              render: (v) => dayjs(v).fromNow()
-            },
-            {
-              title: 'Updated',
-              dataIndex: 'updated',
-              render: (v) => dayjs(v).fromNow()
-            },
-            {
-              title: 'Action',
-              key: 'action',
-              render: (_, record) => (
-                <div className={'space-x-3'}>
-                  <Button size={'small'} onClick={() => {
-                    setState({openCreateDialog: true, selectedBookId: record.id})
-                  }}>Settings</Button>
-                  <Button size={'small'} danger={true} onClick={() => {
-                    modal.confirm({
-                      title: 'Note',
-                      content: 'All files associated with the book will be deleted and will be inaccessible after deletion',
-                      okType: 'danger',
-                      okText: 'Delete',
-                      onOk: () => {
-                        return api.deleteBook.mutate({bookId: record.id}).then(() => {
-                          getBooks()
-                          localdb.book.delete(record.id)
-                        })
-                      }
-                    })
-                  }}>Delete</Button>
-                </div>
-              )
-            }
-          ]}
-        />
-      </div>
-      <CreateBook
-        open={state().openCreateDialog}
-        onClose={() => setState({openCreateDialog: false})}
-        bookId={state().selectedBookId}
-        onUpdate={() => {
-          setState({openCreateDialog: false})
+      <ConfigProvider
+        theme={{
+          algorithm: themeObject
         }}
-      />
+      >
+        {context}
+        <div className={'max-w-[1200px] mx-auto py-10 px-5'}>
+          <div className={'flex justify-between items-center mb-4'}>
+            <div
+              className={
+                'text-gray-800 text-xl font-medium dark:text-white/80 flex items-center'
+              }
+            >
+              <img src={'/icon.png'} className={'w-7 h-7 mr-2'} />
+              <span>Inkdown Book</span>
+            </div>
+            <div className={'space-x-3'}>
+              <Button
+                type={'primary'}
+                icon={<BookOutlined />}
+                onClick={() => {
+                  setState({ selectedBookId: '', openCreateDialog: true })
+                }}
+              >
+                Create Book
+              </Button>
+              <Button
+                icon={<SettingOutlined />}
+                onClick={() => {
+                  setState({ openSettings: true })
+                }}
+              />
+              <Button
+                icon={<LogoutOutlined />}
+                onClick={() => {
+                  modal.confirm({
+                    title: 'Note',
+                    content: 'Do you want to log out?',
+                    onOk: () => {
+                      localStorage.removeItem('inkdown-token')
+                      navigate('/inkdown-login')
+                    }
+                  })
+                }}
+              />
+            </div>
+          </div>
+          <Table
+            rowKey={'id'}
+            size={'middle'}
+            bordered={true}
+            loading={state().loading}
+            dataSource={state().list}
+            pagination={{
+              pageSize: state().pageSize,
+              current: state().page,
+              total: state().total,
+              onChange: (page) => {
+                setState({ page })
+                getBooks()
+              }
+            }}
+            columns={[
+              {
+                title: 'ID',
+                dataIndex: 'id',
+                render: (v) => (
+                  <Link
+                    to={`/doc/${v}`}
+                    className={'underline'}
+                    target={'_blank'}
+                  >
+                    {v}
+                  </Link>
+                )
+              },
+              {
+                title: 'Name',
+                dataIndex: 'name'
+              },
+              {
+                title: 'Created',
+                dataIndex: 'created',
+                render: (v) => dayjs(v).fromNow()
+              },
+              {
+                title: 'Updated',
+                dataIndex: 'updated',
+                render: (v) => dayjs(v).fromNow()
+              },
+              {
+                title: 'Action',
+                key: 'action',
+                render: (_, record) => (
+                  <div className={'space-x-3'}>
+                    <Button
+                      size={'small'}
+                      onClick={() => {
+                        setState({
+                          openCreateDialog: true,
+                          selectedBookId: record.id
+                        })
+                      }}
+                    >
+                      Settings
+                    </Button>
+                    <Button
+                      size={'small'}
+                      danger={true}
+                      onClick={() => {
+                        modal.confirm({
+                          title: 'Note',
+                          content:
+                            'All files associated with the book will be deleted and will be inaccessible after deletion',
+                          okType: 'danger',
+                          okText: 'Delete',
+                          onOk: () => {
+                            return api.deleteBook
+                              .mutate({ bookId: record.id })
+                              .then(() => {
+                                getBooks()
+                                localdb.book.delete(record.id)
+                              })
+                          }
+                        })
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                )
+              }
+            ]}
+          />
+        </div>
+        <CreateBook
+          open={state().openCreateDialog}
+          onClose={() => setState({ openCreateDialog: false })}
+          bookId={state().selectedBookId}
+          onUpdate={() => {
+            setState({ openCreateDialog: false })
+          }}
+        />
+        <Settings
+          open={state().openSettings}
+          onClose={() => {
+            setState({ openSettings: false })
+          }}
+        />
+      </ConfigProvider>
     </ClientOnly>
   )
 }
