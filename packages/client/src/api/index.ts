@@ -1,7 +1,7 @@
 import { CreateTRPCClient, createTRPCClient, httpBatchLink } from '@trpc/client'
 import { AppRouter } from '../../../book/model'
 import { parseDetail } from '../parser/schema'
-import { isLink, nid, slugify } from '../utils'
+import { DataTree, isLink, nid, slugify } from '../utils'
 import pathPkg from 'path-browserify'
 
 type Mode = 'vscode' | 'inkdown' | 'manual' | 'github' | 'gitlab'
@@ -20,14 +20,17 @@ export class IApi {
       name: string
       sha: string
       schema: any[]
+      realPath?: string
       texts: any[]
       links: { text: string; url: string }[]
       medias: { type: 'media'; url: string }[]
     }
   >()
-  private options: {
+  options: {
     mode: Mode
     url: string
+    token: string
+    fetch: typeof window.fetch
     sha1: (data: any) => string
   }
   uploadFile(data: {
@@ -40,9 +43,12 @@ export class IApi {
     Object.keys(data).forEach((key) =>
       form.append(key, data[key as keyof typeof data])
     )
-    return fetch(this.options.url + '/upload', {
+    return this.options.fetch(this.options.url + '/upload', {
       method: 'POST',
-      body: form
+      body: form,
+      headers: {
+        Authorization: `Bearer ${this.options.token}`
+      }
     }).then((res) => res.json())
   }
   getFileData: (path: string) => Promise<File | null>
@@ -60,12 +66,23 @@ export class IApi {
     url: string
     getFileData: (path: string) => Promise<File | null>
     mode: Mode
+    token: string
+    fetch: typeof window.fetch
     sha1: (data: any) => string
   }) {
     options.url = options.url.replace(/\/+$/, '')
     this.$t = createTRPCClient<AppRouter>({
       links: [
         httpBatchLink({
+          fetch: (url, options) => {
+            return this.options.fetch(url, {
+              ...options,
+              headers: {
+                ...options?.headers,
+                Authorization: `Bearer ${this.options.token}`
+              }
+            })
+          },
           url: options.url + '/api'
         })
       ]
@@ -74,10 +91,12 @@ export class IApi {
     this.options = {
       mode: options.mode,
       url: options.url,
-      sha1: options.sha1
+      token: options.token,
+      sha1: options.sha1,
+      fetch: options.fetch
     }
   }
-  private transformTree(data: Tree[], parentPath: string[] = []) {
+  private transformTree(data: DataTree[], parentPath: string[] = []) {
     const docs: Tree[] = []
     for (const item of data) {
       if (item.name.startsWith('.')) {
@@ -94,12 +113,13 @@ export class IApi {
           ])
         })
       } else {
-        const name = item.name.replace(/\.md$/, '')
+        const name = item.name.replace(/\.(md|markdown)$/, '')
         const path = [...parentPath, name].map(p => slugify(p)).join('/')
         const { schema, links, medias, texts } = parseDetail(item.md!)
         this.docMap.set(path, {
           links,
           medias,
+          realPath: item.realPath,
           texts,
           schema,
           name,
@@ -113,8 +133,9 @@ export class IApi {
     }
     return docs
   }
-  async syncBook({id, name, data, settings}: {id: string, name: string, data: Tree[], settings: Record<string, any>}) {
+  async syncBook({id, name, data, settings}: {id: string, name: string, data: DataTree[], settings: Record<string, any>}) {
     this.docMap.clear()
+    id = slugify(id)
     const { docs, files } = await this.$t.getBookDetails.query({
       bookId: id,
       mode: this.options.mode,
@@ -140,7 +161,7 @@ export class IApi {
         if (!isLink(file.url)) {
           const filePath = pathPkg.isAbsolute(file.url)
             ? file.url
-            : pathPkg.join(path, '..', file.url)
+            : pathPkg.join(item.realPath || path, '..', file.url)
           addFiles.add(filePath)
           if (!remoteFilesMap.has(filePath)) {
             const data = await this.getFileData(filePath)
@@ -188,7 +209,7 @@ export class IApi {
     )
 
     const removeDocs = docs.filter(d => !this.docMap.get(d.path)).map(d => d.path)
-    return this.$t.syncBookData.mutate({
+    await this.$t.syncBookData.mutate({
       add,
       removeDocs: removeDocs,
       removeFiles: removeFiles,
@@ -198,8 +219,32 @@ export class IApi {
       texts: JSON.stringify(textData),
       settings: JSON.stringify(settings)
     })
+    return id
   }
   getBook(id: string) {
-    return this.$t.getBook.query({ id })
+    return this.$t.getBook.query({ id: slugify(id) })
+  }
+  getBooks(data: {
+    page: number
+    pageSize: number
+    name?: string
+    sort: ['created' | 'updated', 'asc' | 'desc']
+  }):Promise<{
+    total: number
+    books: {
+      created: string
+      updated: string
+      id: string
+      name: string
+      lasteUpdateMode: string
+    }[]
+  }> {
+    return this.$t.getBooks.query(data)
+  }
+  deleteBook(id: string) {
+    return this.$t.deleteBook.mutate({bookId: slugify(id)})
+  }
+  getEnv():Promise<{ACCESS_KEY_ID: string, ACCESS_KEY_SECRET:string}> {
+    return this.$t.getEnv.query()
   }
 }

@@ -5,7 +5,8 @@ import { useGetSetState } from 'react-use'
 import { useCallback } from 'react'
 import { api } from '../.client/api'
 import { useNavigate } from '@remix-run/react'
-export function Login() {
+import { useClientLayoutEffect } from '../utils/common'
+export function Login(props: {token: null | string}) {
   const navigate = useNavigate()
   const [state, setState] = useGetSetState({
     id: '',
@@ -26,6 +27,12 @@ export function Login() {
     })
   }, [])
   const theme = useAntdTheme()
+  useClientLayoutEffect(() => {
+    if (props.token) {
+      localStorage.setItem('inkdown-token', props.token)
+      navigate('/manage', {replace: true})
+    }
+  }, [])
   return (
     <ClientOnly>
       <ConfigProvider

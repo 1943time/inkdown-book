@@ -1,0 +1,23 @@
+{
+  "name": "Inkdown Book",
+  "id": "zh",
+  "docs": [
+    {
+      "name": "简介",
+      "path": "简介.md"
+    },
+    {
+      "name": "使用方法",
+      "path": "使用方法.md"
+    },
+    {
+      "name": "编辑器",
+      "path": "编辑器.md"
+    }
+  ],
+  "nav": [
+    {"text": "Vs Code", "link": "https://marketplace.visualstudio.com/items?itemName=1943time.inkdown"},
+    {"text": "Inkdown Editor", "link": "https://github.com/1943time/inkdown"},
+    {"text": "GitHub", "link": "https://github.com/1943time/inkdown-book"}
+  ]
+}

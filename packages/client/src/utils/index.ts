@@ -31,3 +31,17 @@ export const slugify = (str: string): string => {
       .toLowerCase()
   )
 }
+
+export const sortTree = <T = any>(tree: T[]) => {
+  return tree.sort((a: any, b: any) => {
+    if (!!a.children !== !!b.children) return a.children ? -1 : 1
+    else return a.name > b.name ? 1 : -1
+  })
+}
+
+export type DataTree = {
+  md?: string
+  realPath?: string
+  name: string
+  children?: DataTree[]
+}

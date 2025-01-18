@@ -6,7 +6,7 @@ export function BackToFirst() {
   return (
     <div className={'flex justify-center mt-20 flex-col items-center'}>
       <div className={'flex items-center'}>
-        <img src={'/logo.svg'} className={'w-5 h-5 mr-2'}/>
+        <img src={'/icon.png'} className={'w-5 h-5 mr-2'}/>
         <span className={'text-lg font-semibold'}>Document not found</span>
       </div>
       <span

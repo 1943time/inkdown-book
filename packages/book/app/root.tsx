@@ -7,6 +7,7 @@ import {
 } from "@remix-run/react";
 import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import './styles/index.scss'
+import 'react-photo-view/dist/react-photo-view.css'
 export const meta: MetaFunction = () => {
   return [{ title: 'Inkdown Book' }]
 }

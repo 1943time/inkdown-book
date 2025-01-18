@@ -13,13 +13,8 @@ import { api } from '../.client/api'
 import { useGetSetState } from 'react-use'
 import { IApi } from '@inkdown/client'
 import { localdb } from '../.client/db'
-import { sortTree } from '../utils/common'
+import { sortTree, DataTree } from '@inkdown/client'
 import {sha1} from 'js-sha1'
-type Tree = {
-  md?: string
-  name: string
-  children?: Tree[]
-}
 export function CreateBook(props: {
   open: boolean
   onClose: () => void
@@ -38,11 +33,13 @@ export function CreateBook(props: {
 
   const readDir = useCallback(
     async (dir: FileSystemDirectoryHandle, parentPath: string[] = []) => {
-      const tree: Tree[] = []
+      const tree: DataTree[] = []
       for await (const [name, handle] of dir.entries()) {
+        const path = [...parentPath, name].join('/')
         if (handle.kind === 'directory') {
           tree.push({
             name,
+            realPath: path,
             children: await readDir(handle, [...parentPath, name])
           })
         } else if (name.endsWith('.md')) {
@@ -50,14 +47,15 @@ export function CreateBook(props: {
           const md = await file.text()
           tree.push({
             name,
-            md
+            md,
+            realPath: path
           })
         }
         if (handle.kind === 'file') {
           filesMap.current.set([...parentPath, name].join('/'), handle)
         }
       }
-      return sortTree(tree)
+      return sortTree(tree) as DataTree[]
     },
     []
   )
@@ -74,27 +72,25 @@ export function CreateBook(props: {
   }, [])
 
   const getMapBySettings = useCallback(
-    async (docs: any[], parentPath: string[] = []) => {
-      const tree: Tree[] = []
+    async (docs: any[]) => {
+      const tree: DataTree[] = []
       for (const item of docs) {
         if (item.path) {
-          const path = [...parentPath, item.path.replace(/^\/+/, '')].join('/')
-          const file = filesMap.current.get(path)
+          const file = filesMap.current.get(item.path)
           if (!file) {
             message.error(`The path ${item.path} does not exist`)
             throw new Error()
           }
           tree.push({
             name: item.name,
+            realPath: item.path,
             md: await file.getFile().then((file) => file.text())
           })
         } else if (item.children) {
           tree.push({
             name: item.name,
-            children: await getMapBySettings(item.children, [
-              ...parentPath,
-              item.name
-            ])
+            realPath: item.path,
+            children: await getMapBySettings(item.children)
           })
         }
       }
@@ -103,7 +99,7 @@ export function CreateBook(props: {
     []
   )
   const getFiles = useCallback(
-    async (data: { id: string; name: string }): Promise<Tree[]> => {
+    async (data: { id: string; name: string }): Promise<DataTree[]> => {
       return new Promise((resolve, reject) => {
         readDir(dirHanndle.current!).then(async (res) => {
           if (!state().settings.id) {
@@ -160,7 +156,9 @@ export function CreateBook(props: {
             return filesMap.current.get(path)?.getFile() || null
           },
           mode: 'manual',
-          sha1
+          token: localStorage.getItem('inkdown-token')!,
+          sha1,
+          fetch: window.fetch.bind(window)
         })
         await client.syncBook({
           id: v.id,

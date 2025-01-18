@@ -9,8 +9,8 @@ import jwt from 'jsonwebtoken'
 export const appRouter = router({
   getEnv: procedure.query(() => {
     return {
-      ACCESS_KEY_ID: process.env.ACCESS_KEY_ID,
-      ACCESS_KEY_SECRET: process.env.ACCESS_KEY_SECRET
+      ACCESS_KEY_ID: process.env.ACCESS_KEY_ID!,
+      ACCESS_KEY_SECRET: process.env.ACCESS_KEY_SECRET!
     }
   }),
   login: procedure.input(z.object({
@@ -18,7 +18,7 @@ export const appRouter = router({
     secret: z.string()
   })).mutation(async ({input}) => {
     if (input.id === process.env.ACCESS_KEY_ID && input.secret === process.env.ACCESS_KEY_SECRET) {
-      return {token: jwt.sign({logged: true}, `${input.id}:${input.secret}`, {expiresIn: '3650 days'})}
+      return {token: jwt.sign({logged: true, id: input.id}, `${input.id}:${input.secret}`, {expiresIn: '365 days'})}
     } else {
       return {token: null}
     }

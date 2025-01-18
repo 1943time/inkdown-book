@@ -46,7 +46,7 @@ export function Media({ node }: { node: any }) {
               style={{ maxHeight: node.height }}
               onClick={() => {
                 const imgs = Array.from(document.querySelectorAll<HTMLImageElement>('[data-be="img"]'))
-                ctx.openViewImages(imgs.map(img => img.src), imgs.findIndex(m => m.src === node.url))
+                ctx.openViewImages(imgs.map(img => img.src), imgs.findIndex(m => m.src === `${location.origin}${node.url}`) || 0)
               }}
               referrerPolicy={'no-referrer'}
               // @ts-ignore
