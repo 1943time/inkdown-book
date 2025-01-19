@@ -4,6 +4,9 @@
     "packages/*"
   ],
   "license": "MIT",
+  "scripts": {
+    "release": "node scripts/build.mjs"
+  },
   "dependencies": {
     "@trpc/client": "11.0.0-rc.666",
     "@trpc/server": "11.0.0-rc.666"

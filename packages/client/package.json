@@ -9,7 +9,8 @@
   },
   "types": "dist/index.d.ts",
   "scripts": {
-    "build:remark": "node src/parser/worker/compiler.js"
+    "build:remark": "node src/parser/worker/compiler.js",
+    "build": "npm run build:remark && vite build"
   },
   "dependencies": {
     "diacritics": "^1.3.0",
