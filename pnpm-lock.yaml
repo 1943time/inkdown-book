@@ -31,7 +31,7 @@ importers:
         specifier: ^4.1.1
         version: 4.1.1(react@18.3.1)
       '@inkdown/client':
-        specifier: workspace:^
+        specifier: 0.1.1
         version: link:../client
       '@prisma/client':
         specifier: 5.15.0
@@ -245,6 +245,12 @@ importers:
       '@remix-run/serve':
         specifier: ^2.15.1
         version: 2.15.2(typescript@5.7.2)
+      '@trpc/client':
+        specifier: 11.0.0-rc.666
+        version: 11.0.0-rc.666(@trpc/server@11.0.0-rc.666)(typescript@5.7.2)
+      '@trpc/server':
+        specifier: 11.0.0-rc.666
+        version: 11.0.0-rc.666(typescript@5.7.2)
       antd:
         specifier: ^5.16.2
         version: 5.22.5(react-dom@18.3.1)(react@18.3.1)
