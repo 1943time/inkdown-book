@@ -6,6 +6,7 @@ import { join } from 'node:path'
 import { existsSync } from 'node:fs'
 import { unlink } from 'node:fs/promises'
 import jwt from 'jsonwebtoken'
+import { exec, execSync } from 'node:child_process'
 export const appRouter = router({
   getEnv: procedure.query(() => {
     return {
@@ -22,6 +23,12 @@ export const appRouter = router({
     } else {
       return {token: null}
     }
+  }),
+  upgrade: procedure.mutation(() => {
+    execSync('curl -OL https://github.com/1943time/inkdown-book/releases/latest/download/inkdown-book.tar.gz', {cwd: process.cwd()})
+    execSync('tar zvxf inkdown-book.tar.gz', {cwd: process.cwd()})
+    exec('node dist/scripts/upgrade.js', {cwd: process.cwd()})
+    return {ok: true}
   }),
   getBookDetails: procedure
     .input(
@@ -88,6 +95,7 @@ export const appRouter = router({
           lasteUpdateMode: true
         }
       })
+      console.log('123', books, where)
       const total = await db.book.count({ where })
       return { books, total }
     }),

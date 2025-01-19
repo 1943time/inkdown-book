@@ -1,12 +1,14 @@
 {
   "name": "@inkdown/book",
   "private": true,
+  "version": "0.1.0",
   "sideEffects": false,
   "type": "module",
   "scripts": {
     "build": "remix vite:build",
     "dev": "remix vite:dev",
     "start": "node scripts/startDetection.mjs && remix-serve ./build/server/index.js",
+    "release": "npm run build && node scripts/build.mjs",
     "typecheck": "tsc"
   },
   "dependencies": {

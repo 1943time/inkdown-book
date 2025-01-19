@@ -222,6 +222,91 @@ importers:
         specifier: ^5.91.0
         version: 5.97.1
 
+  packages/test:
+    dependencies:
+      '@ant-design/icons':
+        specifier: ^5.5.2
+        version: 5.5.2(react-dom@18.3.1)(react@18.3.1)
+      '@iconify/react':
+        specifier: ^4.1.1
+        version: 4.1.1(react@18.3.1)
+      '@inkdown/client':
+        specifier: 0.1.1
+        version: link:../client
+      '@prisma/client':
+        specifier: 5.15.0
+        version: 5.15.0(prisma@6.1.0)
+      '@remix-run/node':
+        specifier: ^2.15.1
+        version: 2.15.2(typescript@5.7.2)
+      '@remix-run/react':
+        specifier: ^2.15.1
+        version: 2.15.2(react-dom@18.3.1)(react@18.3.1)(typescript@5.7.2)
+      '@remix-run/serve':
+        specifier: ^2.15.1
+        version: 2.15.2(typescript@5.7.2)
+      antd:
+        specifier: ^5.16.2
+        version: 5.22.5(react-dom@18.3.1)(react@18.3.1)
+      dayjs:
+        specifier: ^1.11.13
+        version: 1.11.13
+      dexie:
+        specifier: ^4.0.10
+        version: 4.0.10
+      diacritics:
+        specifier: ^1.3.0
+        version: 1.3.0
+      is-hotkey:
+        specifier: ^0.2.0
+        version: 0.2.0
+      isbot:
+        specifier: ^4.1.0
+        version: 4.4.0
+      js-sha1:
+        specifier: ^0.7.0
+        version: 0.7.0
+      jsonwebtoken:
+        specifier: ^9.0.2
+        version: 9.0.2
+      katex:
+        specifier: ^0.16.9
+        version: 0.16.18
+      mermaid:
+        specifier: ^10.9.0
+        version: 10.9.3
+      nanoid:
+        specifier: ^5.0.9
+        version: 5.0.9
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.3.1(react@18.3.1)
+      react-photo-view:
+        specifier: ^1.2.6
+        version: 1.2.6(react-dom@18.3.1)(react@18.3.1)
+      react-use:
+        specifier: ^17.5.0
+        version: 17.6.0(react-dom@18.3.1)(react@18.3.1)
+      shiki:
+        specifier: ^1.24.4
+        version: 1.24.4
+      unified:
+        specifier: ^11.0.4
+        version: 11.0.5
+      zod:
+        specifier: ^3.24.1
+        version: 3.24.1
+    devDependencies:
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.4.7
+      prisma:
+        specifier: ^6.1.0
+        version: 6.1.0
+
 packages:
 
   /@alloc/quick-lru@5.2.0:

@@ -15,12 +15,14 @@ import { IApi } from '@inkdown/client'
 import { localdb } from '../.client/db'
 import { sortTree, DataTree } from '@inkdown/client'
 import {sha1} from 'js-sha1'
+import { useNavigate } from '@remix-run/react'
 export function CreateBook(props: {
   open: boolean
   onClose: () => void
   onUpdate: () => void
   bookId?: string
 }) {
+  const navicate = useNavigate()
   const [notif, contextHolder] = notification.useNotification()
   const dirHanndle = useRef<FileSystemDirectoryHandle>()
   const filesMap = useRef(new Map<string, FileSystemFileHandle>())
@@ -185,7 +187,7 @@ export function CreateBook(props: {
               size='small'
               onClick={() => {
                 notif.destroy()
-                window.open(`${location.host}/doc/${v.id}`)
+                window.open(`${location.origin}/doc/${v.id}`)
               }}
             >
               Open

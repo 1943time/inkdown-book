@@ -1,0 +1,60 @@
+name: Package
+
+on:
+  push:
+    tags: v*
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-20.04
+            platform: linux
+
+    runs-on: ${{ matrix.os }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install
+        run: |
+          pnpm install
+
+      - name: Install Book
+        run: |
+          pnpm install
+        working-directory: ./packages/book
+
+      - name: Build
+        run: |
+          npm run release
+          tar czvf inkdown-book.tar.gz dist
+        working-directory: ./packages/book
+
+      - name: GH Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          draft: ''
+          prerelease: true
+          files: |
+            packages/book/inkdown-book.tar.gz
+            packages/book/scripts/install.sh
