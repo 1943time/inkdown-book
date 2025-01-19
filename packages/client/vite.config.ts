@@ -11,7 +11,6 @@ export default defineConfig({
     lib: {
       entry: 'src/index.ts',
       name: 'main',
-      formats: ['es'],
       fileName: (format) => `main.${format}.js`
     },
   }
