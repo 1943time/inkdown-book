@@ -12,13 +12,13 @@ export const useUpdate = () => {
     // const data:{tag_name: string} = await fetch('https://api.github.com/repos/1943time/inkdown-book/releases/latest').then(res => res.json())
     // if (data?.tag_name) {
     //   const remote = data.tag_name.slice(1)
-    //   if (compareVersions(version.current, remote)) {
+    //   if (compareVersions(version.current, remote) === -1) {
     //     setUpdate(true)
     //   }
     // }
-    setTimeout(() => {
-      check()
-    }, 1000 * 600)
+    // setTimeout(() => {
+    //   check()
+    // }, 1000 * 600)
   }, [])
   useEffect(() => {
     check()

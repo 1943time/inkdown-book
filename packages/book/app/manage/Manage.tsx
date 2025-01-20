@@ -13,7 +13,7 @@ import {
 } from '@ant-design/icons'
 import { localdb } from '../.client/db'
 import { Link, useNavigate } from '@remix-run/react'
-import { useClientLayoutEffect } from '../utils/common'
+import { sleep, useClientLayoutEffect } from '../utils/common'
 import { Settings } from './Settings'
 import { useUpdate } from './update'
 dayjs.extend(relativeTime)
@@ -74,7 +74,11 @@ export function Manage() {
   useClientLayoutEffect(() => {
     let theme = localStorage.getItem('theme')
     if (!theme) {
-      theme = window.matchMedia && window.matchMedia('(prefers-color-scheme:dark)').matches  ? 'dark' : ''
+      theme =
+        window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme:dark)').matches
+          ? 'dark'
+          : ''
     }
     setState({ theme: theme || '', ready: true })
   }, [])
@@ -109,9 +113,31 @@ export function Manage() {
               >
                 Create Book
               </Button> */}
-              {update && 
-                <Button color={'orange'} variant={'outlined'} icon={<ArrowUpOutlined />}/>
-              }
+              {update && (
+                <Button
+                  color={'orange'}
+                  variant={'outlined'}
+                  icon={<ArrowUpOutlined />}
+                  onClick={() => {
+                    modal.confirm({
+                      title: 'A new version is available',
+                      content: 'Do you want to update Inkdown Book now?',
+                      okText: 'Update',
+                      onOk: async () => {
+                        await api.upgrade.mutate()
+                        while (true) {
+                          try {
+                            await api.getEnv.query()
+                            window.location.reload()
+                          } finally {
+                            await sleep(1000)
+                          }
+                        }
+                      }
+                    })
+                  }}
+                />
+              )}
               <Button
                 icon={<SettingOutlined />}
                 onClick={() => {

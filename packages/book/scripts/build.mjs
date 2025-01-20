@@ -1,11 +1,14 @@
 import { execSync } from 'child_process'
-import { cpSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
+import { cpSync, mkdirSync, readFileSync, writeFileSync, existsSync, rmSync } from 'fs'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 const root = join(__dirname, '../')
 const dist = join(root, 'dist')
+if (existsSync(dist)) {
+  rmSync(dist, {force: true, recursive: true})
+}
 execSync('npm run build', {cwd: join(root, '../client')})
 execSync('npm run build', {cwd: root})
 mkdirSync(dist)
