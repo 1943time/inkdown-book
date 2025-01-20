@@ -101,7 +101,7 @@ export function Manage() {
               }
             >
               <img src={'/icon.png'} className={'w-7 h-7 mr-2'} />
-              <span>Inkdown Book</span>
+              <span>Inkdown Book1</span>
             </div>
             <div className={'space-x-3'}>
               {/* <Button
