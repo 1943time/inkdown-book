@@ -1,11 +1,11 @@
 {
-  "name": "inkdown-browser",
+  "name": "inkdown-book",
   "workspaces": [
     "packages/*"
   ],
   "license": "MIT",
   "scripts": {
-    "release": "node scripts/build.mjs"
+    "release": "node packages/book/scripts/build.mjs"
   },
   "dependencies": {
     "@trpc/client": "11.0.0-rc.666",
