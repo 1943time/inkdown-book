@@ -28,8 +28,10 @@ cpSync(join(root, 'Dockerfile'), join(dist, 'Dockerfile'))
 cpSync(join(root, '.dockerignore'), join(dist, '.dockerignore'))
 mkdirSync(join(dist, 'scripts'))
 cpSync(join(root, 'scripts/startDetection.mjs'), join(dist, 'scripts/startDetection.mjs'))
+cpSync(join(root, 'scripts/upgrade.mjs'), join(dist, 'scripts/upgrade.mjs'))
 writeFileSync(
   join(dist, 'package.json'),
   readFileSync(join(root, 'scripts/package.json'))
 )
+writeFileSync(join(dist, '.env'), 'DATABASE_URL="file:./data.db"', {encoding: 'utf-8'})
 execSync(`tar czvf inkdown-book.tar.gz dist`, {cwd: root})

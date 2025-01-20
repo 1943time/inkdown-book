@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { db } from '../prisma'
 import { Prisma } from '@prisma/client'
 import { join } from 'node:path'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { unlink } from 'node:fs/promises'
 import jwt from 'jsonwebtoken'
 import { exec, execSync } from 'node:child_process'
@@ -24,10 +24,14 @@ export const appRouter = router({
       return {token: null}
     }
   }),
+  getVersion: procedure.query(() => {
+    const code = readFileSync(join(process.cwd(), 'package.json'), {encoding: 'utf-8'})
+    return {version: JSON.parse(code).version}
+  }),
   upgrade: procedure.mutation(() => {
     execSync('curl -OL https://github.com/1943time/inkdown-book/releases/latest/download/inkdown-book.tar.gz', {cwd: process.cwd()})
     execSync('tar zvxf inkdown-book.tar.gz', {cwd: process.cwd()})
-    exec('node dist/scripts/upgrade.js', {cwd: process.cwd()})
+    exec('node dist/scripts/upgrade.mjs', {cwd: process.cwd()})
     return {ok: true}
   }),
   getBookDetails: procedure
@@ -95,7 +99,6 @@ export const appRouter = router({
           lasteUpdateMode: true
         }
       })
-      console.log('123', books, where)
       const total = await db.book.count({ where })
       return { books, total }
     }),

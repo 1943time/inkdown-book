@@ -34,9 +34,7 @@
     "unified": "^11.0.4",
     "zod": "^3.24.1",
     "@trpc/client": "11.0.0-rc.666",
-    "@trpc/server": "11.0.0-rc.666"
-  },
-  "devDependencies": {
+    "@trpc/server": "11.0.0-rc.666",
     "dotenv": "^16.4.7",
     "prisma": "^6.1.0"
   },

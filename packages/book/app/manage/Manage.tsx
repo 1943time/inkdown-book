@@ -6,19 +6,21 @@ import { Button, ConfigProvider, Modal, Table, theme } from 'antd'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import dayjs from 'dayjs'
 import {
-  BookOutlined,
+  ArrowUpOutlined,
   LogoutOutlined,
-  SettingOutlined
+  SettingOutlined,
+  UpOutlined
 } from '@ant-design/icons'
-import { CreateBook } from './CreateBook'
 import { localdb } from '../.client/db'
 import { Link, useNavigate } from '@remix-run/react'
 import { useClientLayoutEffect } from '../utils/common'
 import { Settings } from './Settings'
+import { useUpdate } from './update'
 dayjs.extend(relativeTime)
 export function Manage() {
   const [modal, context] = Modal.useModal()
   const navigate = useNavigate()
+  const update = useUpdate()
   const [state, setState] = useGetSetState({
     page: 1,
     pageSize: 10,
@@ -98,7 +100,7 @@ export function Manage() {
               <span>Inkdown Book</span>
             </div>
             <div className={'space-x-3'}>
-              <Button
+              {/* <Button
                 type={'primary'}
                 icon={<BookOutlined />}
                 onClick={() => {
@@ -106,7 +108,10 @@ export function Manage() {
                 }}
               >
                 Create Book
-              </Button>
+              </Button> */}
+              {update && 
+                <Button color={'orange'} variant={'outlined'} icon={<ArrowUpOutlined />}/>
+              }
               <Button
                 icon={<SettingOutlined />}
                 onClick={() => {
@@ -178,17 +183,6 @@ export function Manage() {
                   <div className={'space-x-3'}>
                     <Button
                       size={'small'}
-                      onClick={() => {
-                        setState({
-                          openCreateDialog: true,
-                          selectedBookId: record.id
-                        })
-                      }}
-                    >
-                      Settings
-                    </Button>
-                    <Button
-                      size={'small'}
                       danger={true}
                       onClick={() => {
                         modal.confirm({
@@ -216,14 +210,14 @@ export function Manage() {
             ]}
           />
         </div>
-        <CreateBook
+        {/* <CreateBook
           open={state().openCreateDialog}
           onClose={() => setState({ openCreateDialog: false })}
           bookId={state().selectedBookId}
           onUpdate={() => {
             setState({ openCreateDialog: false })
           }}
-        />
+        /> */}
         <Settings
           open={state().openSettings}
           onClose={() => {
