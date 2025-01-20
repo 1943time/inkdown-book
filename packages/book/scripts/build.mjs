@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 const root = join(__dirname, '../')
 const dist = join(root, 'dist')
-// execSync('npm run build', {cwd: join(__dirname, '../packages/client')})
+execSync('npm run build', {cwd: join(root, '../client')})
 execSync('npm run build', {cwd: root})
 mkdirSync(dist)
 cpSync(join(root, 'build'), join(dist, 'build'), {
