@@ -31,7 +31,7 @@ importers:
         specifier: ^4.1.1
         version: 4.1.1(react@18.3.1)
       '@inkdown/client':
-        specifier: 0.1.4
+        specifier: 0.1.6
         version: link:../client
       '@prisma/client':
         specifier: 5.15.0
