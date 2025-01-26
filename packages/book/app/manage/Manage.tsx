@@ -8,8 +8,7 @@ import dayjs from 'dayjs'
 import {
   ArrowUpOutlined,
   LogoutOutlined,
-  SettingOutlined,
-  UpOutlined
+  SettingOutlined
 } from '@ant-design/icons'
 import { localdb } from '../.client/db'
 import { Link, useNavigate } from '@remix-run/react'
@@ -101,7 +100,7 @@ export function Manage() {
               }
             >
               <img src={'/icon.png'} className={'w-7 h-7 mr-2'} />
-              <span>Inkdown Book1</span>
+              <span>Inkdown Book</span>
             </div>
             <div className={'space-x-3'}>
               {/* <Button
@@ -128,7 +127,10 @@ export function Manage() {
                         while (true) {
                           try {
                             await api.getEnv.query()
-                            window.location.reload()
+                            setTimeout(() => {
+                              window.location.reload()
+                            }, 2000)
+                            break
                           } finally {
                             await sleep(1000)
                           }

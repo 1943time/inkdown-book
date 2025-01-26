@@ -1,12 +1,14 @@
 {
   "name": "@inkdown/client",
   "type": "module",
-  "version": "0.1.4",
+  "version": "0.1.6",
+  "main": "dist/main.umd.js",
+  "module": "dist/main.es.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/main.es.js",
-      "require": "./dist/main.umd.js"
+      "require": "./dist/main.es.js"
     }
   },
   "types": "dist/index.d.ts",

@@ -4,7 +4,6 @@ import { Link, useParams } from '@remix-run/react'
 
 export function Leading(props: { schema: any[]; book?: boolean }) {
   const params = useParams()
-  const timer = useRef(0)
   const [state, setState] = useGetSetState({
     index: -1,
     markTop: 0,
@@ -19,7 +18,6 @@ export function Leading(props: { schema: any[]; book?: boolean }) {
       })
     return heads
   }, [params['*']])
-
   const reverseHeads = useMemo(() => heads.slice().reverse(), [heads])
   const moveMark = useCallback((i: number) => {
     const dom = document.querySelectorAll<HTMLDivElement>('.leading-item')?.[i]
@@ -44,13 +42,14 @@ export function Leading(props: { schema: any[]; book?: boolean }) {
       }
     })
     if (!find) setState({ index: -1, markHeight: 0, markTop: 0 })
-  }, [])
+  }, [params['*']])
+
   useEffect(() => {
     window.addEventListener('scroll', scroll, { passive: true })
     return () => {
       window.removeEventListener('scroll', scroll)
     }
-  }, [])
+  }, [params['*']])
   return (
     <div
       className={`leading-container ${

@@ -1,12 +1,12 @@
-# Inkdown编辑器
+# Inkdown Editor
 
-Inkdown是一个Markdown所见即所得编辑器，目标为改善Markdown编辑和阅读体验，Markdown作为通用格式非常适合存储个人数据，但是过多的符号导致它并不擅长长文本记录。Inkdown希望保持现代编辑器体验，与Markdown的通用性，并提供最简单高效的文档共享能力。
+Inkdown is a WYSIWYG editor for Markdown, aimed at improving the editing and reading experience of Markdown. As a universal format, Markdown is very suitable for storing personal data, but the excessive number of symbols makes it not good at recording long texts. Inkdown aims to maintain a modern editor experience, compatibility with Markdown, and provide the simplest and most efficient document sharing capabilities.
 
 | VsCode                                                                         | Mac                                                                                                                                                                                 | Windows                                                                                                                                                                               | Linux                                                          |
 | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
 | [Market](https://marketplace.visualstudio.com/items?itemName=1943time.inkdown) | [Arm64](https://github.com/1943time/inkdown/releases/latest/download/Inkdown-mac-arm64.dmg) [X64](https://github.com/1943time/inkdown/releases/latest/download/Inkdown-mac-x64.dmg) | [Arm64](https://github.com/1943time/inkdown/releases/latest/download/Inkdown-win-arm64.exe)   [X64](https://github.com/1943time/inkdown/releases/latest/download/Inkdown-win-x64.exe) | [Release](https://github.com/1943time/inkdown/releases/latest) |
 
-桌面版
+Desktop
 
 ![](../.images/sqifkUbfvYL2pg4.png)
 
@@ -14,23 +14,25 @@ VsCode
 
 ![](.images/ZCuwR91nG1WeRW9.png)
 
-你可以使用浮动栏中的链接选项为文本添加链接，链接可以是空间内的其他 markdown 文件，也可以是 HTTP 等协议地址。如下图所示：
+## Link
 
-> Inkdown 使用相对路径在源 markdown 文件中保存文件链接。
+You can use the link options in the floating bar to add links to text, which can be other markdown files in the space or protocol addresses such as HTTP. As shown in the following figure:
+
+> Inkdown uses relative paths to save file links in the source markdown file.
 
 <img src="../.images/wcrsMkfWN8xXrAX.png" alt="" height="256" />
 
-也可以使用 `tab`来补全文件路径，并添加 `#` 来链接到 markdown 文件的锚点
+You can also use tabs to complete the file path and add `#` to link to the anchor point of the markdown file
 
 <img src="../.images/td89oNzg4FWfmL3.png" alt="" height="289" />
 
 ## Github Table
 
-创建表后，使用`mod++shift+enter`创建新行，使用`mod+shif+backspace`删除当前行。
+After creating the table, use `mod++shift+enter` to create a new row, and use `mod+shift+backspace` to delete the current row.
 
-> 在任意表格单元中右键可以查看更多操作
+> Right click in any table cell to view more operations
 > 
-> 使用`tab`键切换到下一个表单元格，`shift+tab`键返回上一个表单元
+> Use the `tab` key to switch to the next table cell, `shift+tab` key to return to the previous table cell
 
 | Name | Area     | Balance |
 | ---- | -------- | ------- |
@@ -40,7 +42,7 @@ VsCode
 
 ## List
 
-在段落开头键入`1`或`-`加空格可以将其转换为有序或无序列表。在段落开头添加`[]`和空格可以将它们转换为任务列表，也可以使用系统菜单中的快捷键来控制它们。
+Typing `1` or `-` with spaces at the beginning of a paragraph can convert it to an ordered or unordered list. Adding`[ ]`and spaces at the beginning of a paragraph can convert them into a task list, or use shortcut keys in the system menu to control them.
 
 1. List item1
 2. List item2
@@ -63,23 +65,23 @@ VsCode
 - Todo1
 - Todo2
 
-列表项可以与内容嵌套。使用`mod+enter`将新元素插入列表项中，并使用tab或`shift+tab`缩进或撤消列表。
+List items can be nested with content. Use `mod+enter` to insert new elements into list items, and use tab or `shift+tab` to indent or undo the list.
 
 ## Front Matter
 
-在文档开头输入`---`符号，然后按Enter键插入Front matter元素。Inkdown仅显示内容，无需任何特殊处理。
+Enter the `---` symbol at the beginning of the document and press Enter to insert the `Front matter` element. Inkdown will only display the Front matter without any special processing.
 
 ## Code fences
 
-在段落开头输入以下内容，并添加一个输入以创建代码围栏
+Enter the following content at the beginning of the paragraph and add a enter to create a code fence
 
 ````
 ```[language]
 ````
 
-在代码围栏的末尾，使用`mod+enter`跳出代码段或使用上下箭头键。
+At the end of the code fence, use `mod+enter` to jump out of the code snippet or use the up and down arrow keys.
 
-> 注意：在代码围栏中使用`mod+a`时，围栏中的代码将被选中，而不是整个文档。当代码围栏内容为空时，使用删除键可直接删除元素。
+> Note: When using `mod+a` in a code fence, the code in the fence will be selected instead of the entire document. When the code fence content is empty, use `backspace` to directly delete the element.
 
 ```ts
 class Human {
@@ -111,21 +113,21 @@ var aStruct = MarksStruct(mark: 98)
 print(aStruct.mark)
 ```
 
-## 公式
+## Formula
 
-在段落的开头键入`$$`以创建块级公式编辑区域，公式将在下面自动呈现。当光标离开编辑区域时，它将自动折叠。渲染效果如下：
+Type`$$`at the beginning of the pfaragraph to create a block level formula editing area, where the formula will automatically render below. When the cursor leaves the editing area, it will be automatically folded. The rendering effect is as follows:
 
 $$
 \int_{-\infty}^{+\infty} e^{-x^2} dx = \sqrt{\pi}
 $$
 
-行内公式:$\int_{-\infty}^{+\infty} e^{-x^2} dx = \sqrt{\pi}$
+In line formula:$\int_{-\infty}^{+\infty} e^{-x^2} dx = \sqrt{\pi}$
 
 ## Mermaid
 
-Mermaid是一个使用语法渲染图形的工具。当您为Mermaid语言创建代码围栏时，Mermaid图形将在代码片段下方自动渲染，以获取[更多详细信息](https://mermaid.js.org/)。
+Mermaid is a tool that uses syntax to render graphics. When you create a code fence for the Mermaid language, the Mermaid graphics will be automatically rendered below the code snippet for [more details](https://mermaid.js.org/).
 
-当光标离开输入区域时，代码围栏将自动折叠，渲染效果如下：
+When the cursor leaves the input area, the code fence will be automatically collapsed, and the rendering effect is as follows:
 
 ```mermaid
 sequenceDiagram

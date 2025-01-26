@@ -1,7 +1,7 @@
 import { CreateTRPCClient, createTRPCClient, httpBatchLink } from '@trpc/client'
 import { AppRouter } from '../../../book/model'
 import { parseDetail } from '../parser/schema'
-import { DataTree, isLink, nid, slugify } from '../utils'
+import { bulk, DataTree, isLink, nid, parsePath, slugify } from '../utils'
 import pathPkg from 'path-browserify'
 
 type Mode = 'vscode' | 'inkdown' | 'manual' | 'github' | 'gitlab'
@@ -26,6 +26,7 @@ export class IApi {
       medias: { type: 'media'; url: string }[]
     }
   >()
+  private realPathMap = new Map<string, string>()
   options: {
     mode: Mode
     url: string
@@ -125,6 +126,7 @@ export class IApi {
           name,
           sha: this.sha1(item.md!)
         })
+        this.realPathMap.set(item.realPath!, path)
         docs.push({
           name,
           path
@@ -135,6 +137,7 @@ export class IApi {
   }
   async syncBook({id, name, data, settings}: {id: string, name: string, data: DataTree[], settings: Record<string, any>}) {
     this.docMap.clear()
+    this.realPathMap.clear()
     id = slugify(id)
     const { docs, files } = await this.$t.getBookDetails.query({
       bookId: id,
@@ -143,13 +146,11 @@ export class IApi {
     })
     
     const remoteFilesMap = new Map(files.map((f) => [f.path, f.name]))
-    const remoteDocsMap = new Map(docs.map((d) => [d.path, d]))
     const add: { path: string; schema: string; sha: string }[] = []
     const addFiles = new Set<string>()
     const textData: { path: string; name: string; texts: any }[] = []
     const map = this.transformTree(data)
     for (const [path, item] of this.docMap) {
-      const remote = remoteDocsMap.get(path)
       const sha = this.sha1(item.sha)
       textData.push({
         path: path,
@@ -185,15 +186,15 @@ export class IApi {
           }
         }
       }
-      if (remote && remote.sha === sha) continue
-      
       for (const link of item.links) {
-        if (!isLink(link.url) && link.url.endsWith('.md')) {
-          const target = !pathPkg.isAbsolute(link.url)
-            ? pathPkg.join(path, '..', link.url).replace(/\.md/, '')
-            : '/' + link.url.replace(/\.md/, '')
-          if (this.docMap.get(target)) {
-            link.url = target
+        if (link.url && !isLink(link.url) && link.url.endsWith('.md')) {
+          const ps = parsePath(link.url)
+          const target = !pathPkg.isAbsolute(ps.path)
+            ? pathPkg.join(item.realPath!, '..', ps.path)
+            : '/' + ps.path
+          console.log('url', link.url, target, this.realPathMap)
+          if (this.realPathMap.get(target)) {
+            link.url = this.realPathMap.get(target)! + (ps.hash ? `#${ps.hash}` : '')
           }
         }
       }
@@ -210,7 +211,6 @@ export class IApi {
 
     const removeDocs = docs.filter(d => !this.docMap.get(d.path)).map(d => d.path)
     await this.$t.syncBookData.mutate({
-      add,
       removeDocs: removeDocs,
       removeFiles: removeFiles,
       bookId: id,
@@ -219,10 +219,19 @@ export class IApi {
       texts: JSON.stringify(textData),
       settings: JSON.stringify(settings)
     })
+    await bulk(add, docs => {
+      return this.$t.insertDocs.mutate({
+        add: docs,
+        bookId: id
+      })
+    })
     return id
   }
   getBook(id: string) {
     return this.$t.getBook.query({ id: slugify(id) })
+  }
+  getAllBookId():Promise<{id: string}[]> {
+    return this.$t.getAllBookId.query()
   }
   getBooks(data: {
     page: number

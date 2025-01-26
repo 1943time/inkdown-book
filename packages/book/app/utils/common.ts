@@ -15,11 +15,8 @@ export const slugify = (str: string): string => {
       .replace(rSpecial, '-')
       // Remove continuous separators
       .replace(/\-{2,}/g, '-')
-
       // Remove prefixing and trailing separators
       .replace(/^\-+|\-+$/g, '')
-      // ensure it doesn't start with a number (#121)
-      .replace(/^(\d)/, '_$1')
       // lowercase
       .toLowerCase()
   )
@@ -107,4 +104,12 @@ export const sortTree = (tree: {name: string, children?: any[]}[]) => {
     if (!!a.children !== !!b.children) return a.children ? -1 : 1
     else return a.name > b.name ? 1 : -1
   })
+}
+
+export const parsePath = (path: string) => {
+  const m = path.match(/#([^\n#\/]+)?$/)
+  if (m) {
+    return { path: path.replace(m[0], ''), hash: m[1] || '' }
+  }
+  return { path, hash: null }
 }

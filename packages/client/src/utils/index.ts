@@ -45,3 +45,20 @@ export type DataTree = {
   name: string
   children?: DataTree[]
 }
+
+export const parsePath = (path: string) => {
+  const m = path.match(/#([^\n#\/]+)?$/)
+  if (m) {
+    return { path: path.replace(m[0], ''), hash: m[1] || '' }
+  }
+  return { path, hash: null }
+}
+
+export const bulk = async <T = any>(data: T[], cb: (data: T[]) => any, size = 10) => {
+  for (let i = 0; i <= data.length; i += size) {
+    const stack = data.slice(i, i + size)
+    if (!stack.length) break
+    await cb(stack)
+    if (stack.length < size) break
+  }
+}

@@ -7,6 +7,10 @@ import { existsSync, readFileSync } from 'node:fs'
 import { unlink } from 'node:fs/promises'
 import jwt from 'jsonwebtoken'
 import { exec, execSync } from 'node:child_process'
+const loginCache = {
+  num: 0,
+  last: null as null | number
+}
 export const appRouter = router({
   getEnv: procedure.query(() => {
     return {
@@ -18,10 +22,20 @@ export const appRouter = router({
     id: z.string(),
     secret: z.string()
   })).mutation(async ({input}) => {
+    if (loginCache.num >= 10 ) {
+      if (loginCache.last && Date.now() - loginCache.last < 60 * 3600 * 1000) {
+        return {token: null, reject: true}        
+      } else {
+        loginCache.num = 0
+        loginCache.last = null
+      }
+    }
     if (input.id === process.env.ACCESS_KEY_ID && input.secret === process.env.ACCESS_KEY_SECRET) {
-      return {token: jwt.sign({logged: true, id: input.id}, `${input.id}:${input.secret}`, {expiresIn: '365 days'})}
+      return {token: jwt.sign({logged: true, id: input.id}, `${input.id}:${input.secret}`, {expiresIn: '365 days'}), reject: false}
     } else {
-      return {token: null}
+      loginCache.num++
+      loginCache.last = Date.now()
+      return {token: null, reject: false}
     }
   }),
   getVersion: procedure.query(() => {
@@ -178,6 +192,33 @@ export const appRouter = router({
         settings: JSON.parse(data.settings)
       }
     }),
+  insertDocs: procedure.input(z.object({
+    bookId: z.string(),
+    add: z.object({
+      path: z.string(),
+      sha: z.string(),
+      schema: z.any()
+    }).array()
+  })).mutation(async ({input}) => {
+    for (const item of input.add) {
+      await db.doc.upsert({
+        where: {
+          path_bookId: { path: item.path, bookId: input.bookId }
+        },
+        create: {
+          path: item.path,
+          sha: item.sha,
+          schema: item.schema,
+          bookId: input.bookId
+        },
+        update: {
+          schema: item.schema,
+          sha: item.sha
+        }
+      })
+    }
+    return {ok: true}
+  }),
   syncBookData: procedure
     .input(
       z.object({
@@ -187,14 +228,7 @@ export const appRouter = router({
         texts: z.string(),
         name: z.string(),
         removeFiles: z.string().array(),
-        settings: z.string(),
-        add: z
-          .object({
-            path: z.string(),
-            sha: z.string(),
-            schema: z.any()
-          })
-          .array()
+        settings: z.string()
       })
     )
     .mutation(async ({ input }) => {
@@ -203,25 +237,6 @@ export const appRouter = router({
           await t.doc.deleteMany({
             where: { bookId: input.bookId, path: { in: input.removeDocs } }
           })
-        }
-        if (input.add.length) {
-          for (const item of input.add) {
-            await t.doc.upsert({
-              where: {
-                path_bookId: { path: item.path, bookId: input.bookId }
-              },
-              create: {
-                path: item.path,
-                sha: item.sha,
-                schema: item.schema,
-                bookId: input.bookId
-              },
-              update: {
-                schema: item.schema,
-                sha: item.sha
-              }
-            })
-          }
         }
         await t.book.update({
           where: { id: input.bookId },
@@ -256,5 +271,10 @@ export const appRouter = router({
         }
         return { ok: true }
       })
+    }),
+  getAllBookId: procedure.query(() => {
+    return db.book.findMany({
+      select: {id: true}
     })
+  })
 })

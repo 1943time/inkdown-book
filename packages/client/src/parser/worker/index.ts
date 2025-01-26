@@ -1,6 +1,6 @@
 // pre-build to enable parse to run in the worker
 import parser from './bundle'
-import {Content, Table} from 'mdast'
+import { Content, Table } from 'mdast'
 
 const findImageElement = (str: string) => {
   try {

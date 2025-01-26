@@ -22,7 +22,7 @@ export function Login(props: {token: null | string}) {
         localStorage.setItem('inkdown-token', res.token)
         navigate('/manage', {replace: true})
       } else {
-        msg.warning(`The id or secret is incorrect`)
+        msg.warning(res.reject ? 'You have attempted to log in too many times. Please try again after one hour.' : `The id or secret is incorrect`)
       }
     })
   }, [])
