@@ -121,18 +121,14 @@ export function Manage() {
                       okText: 'Update',
                       onOk: async () => {
                         await api.upgrade.mutate()
-                        await sleep(1000)
-                        while (true) {
-                          try {
-                            await api.getEnv.query()
-                            setTimeout(() => {
-                              window.location.reload()
-                            }, 2000)
-                            break
-                          } finally {
-                            await sleep(1000)
-                          }
-                        }
+                        let timer = 0
+                        timer = window.setInterval(async () => {
+                          await api.getEnv.query()
+                          clearTimeout(timer)
+                          setTimeout(() => {
+                            window.location.reload()
+                          }, 3000)
+                        }, 2000)
                       }
                     })
                   }}

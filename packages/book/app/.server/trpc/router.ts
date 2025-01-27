@@ -6,7 +6,7 @@ import { join } from 'node:path'
 import { existsSync, readFileSync } from 'node:fs'
 import { unlink } from 'node:fs/promises'
 import jwt from 'jsonwebtoken'
-import { exec, execSync } from 'node:child_process'
+import { execSync, exec } from 'node:child_process'
 const loginCache = {
   num: 0,
   last: null as null | number
@@ -46,6 +46,7 @@ export const appRouter = router({
     execSync('curl -OL https://github.com/1943time/inkdown-book/releases/latest/download/inkdown-book.tar.gz', {cwd: process.cwd()})
     execSync('tar zvxf inkdown-book.tar.gz', {cwd: process.cwd()})
     execSync('node dist/scripts/upgrade.mjs', {cwd: process.cwd()})
+    exec('pm2 restart ecosystem.config.cjs', {cwd: process.cwd()})
     return {ok: true}
   }),
   getBookDetails: procedure
