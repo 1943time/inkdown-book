@@ -2,7 +2,7 @@
   "name": "@inkdown/book",
   "private": true,
   "sideEffects": false,
-  "version": "0.1.5",
+  "version": "0.1.6",
   "type": "module",
   "scripts": {
     "start": "node scripts/startDetection.mjs && remix-serve ./build/server/index.js --PORT=3000"
@@ -23,6 +23,7 @@
     "isbot": "^4.1.0",
     "js-sha1": "^0.7.0",
     "jsonwebtoken": "^9.0.2",
+    "compare-versions": "^6.1.1",
     "katex": "^0.16.9",
     "mermaid": "^10.9.0",
     "nanoid": "^5.0.9",
