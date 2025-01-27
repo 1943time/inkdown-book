@@ -2,10 +2,10 @@
   "name": "@inkdown/book",
   "private": true,
   "sideEffects": false,
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "scripts": {
-    "start": "node scripts/startDetection.mjs && remix-serve ./build/server/index.js"
+    "start": "node scripts/startDetection.mjs && remix-serve ./build/server/index.js --PORT=3000"
   },
   "dependencies": {
     "@inkdown/client": "0.1.1",

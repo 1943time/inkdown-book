@@ -3,6 +3,10 @@ import { useMemo } from 'react'
 import { useGetSetState } from 'react-use'
 import { useClientLayoutEffect } from './common'
 
+export const isDark = () =>
+  window.matchMedia &&
+  window.matchMedia?.('(prefers-color-scheme: dark)').matches
+
 export const useAntdTheme = () => {
   const [state, setState] = useGetSetState({
     theme: ''
@@ -14,7 +18,7 @@ export const useAntdTheme = () => {
   }, [state().theme])
   useClientLayoutEffect(() => {
     const theme = localStorage.getItem('theme')
-    setState({ theme: theme || '' })
+    setState({ theme: theme || isDark() ? 'dark' : 'light' })
   }, [])
   return themeObject as any
 }

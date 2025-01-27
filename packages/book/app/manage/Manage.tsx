@@ -15,6 +15,7 @@ import { Link, useNavigate } from '@remix-run/react'
 import { sleep, useClientLayoutEffect } from '../utils/common'
 import { Settings } from './Settings'
 import { useUpdate } from './update'
+import { isDark } from '../utils/theme'
 dayjs.extend(relativeTime)
 export function Manage() {
   const [modal, context] = Modal.useModal()
@@ -73,11 +74,7 @@ export function Manage() {
   useClientLayoutEffect(() => {
     let theme = localStorage.getItem('theme')
     if (!theme) {
-      theme =
-        window.matchMedia &&
-        window.matchMedia('(prefers-color-scheme:dark)').matches
-          ? 'dark'
-          : ''
+      theme = isDark() ? 'dark' : ''
     }
     setState({ theme: theme || '', ready: true })
   }, [])

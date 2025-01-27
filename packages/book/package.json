@@ -7,7 +7,7 @@
   "scripts": {
     "build": "remix vite:build",
     "dev": "remix vite:dev",
-    "start": "node scripts/startDetection.mjs && remix-serve ./build/server/index.js",
+    "start": "node scripts/startDetection.mjs && remix-serve ./build/server/index.js --PORT=3000",
     "typecheck": "tsc"
   },
   "dependencies": {
