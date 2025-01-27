@@ -18,7 +18,7 @@ export const useAntdTheme = () => {
   }, [state().theme])
   useClientLayoutEffect(() => {
     const theme = localStorage.getItem('theme')
-    setState({ theme: theme || isDark() ? 'dark' : 'light' })
+    setState({ theme: theme ? theme : (isDark() ? 'dark' : 'light') })
   }, [])
   return themeObject as any
 }

@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'url'
 import {dirname, join} from 'path'
 import { cpSync, readFileSync, rmSync, writeFileSync } from 'fs'
-import { execSync } from 'child_process'
+import { exec } from 'child_process'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 const root = join(__dirname, '../..')
@@ -18,4 +18,4 @@ cpSync(__dirname, join(root, 'scripts'), {force: true, recursive: true})
 cpSync(join(__dirname, '../ecosystem.config.cjs'), join(root, 'ecosystem.config.cjs'), {force: true})
 rmSync(join(root, 'inkdown-book.tar.gz'), {force: true})
 rmSync(join(root, 'dist'), {force: true, recursive: true})
-execSync('pm2 restart inkdown-book', {cwd: root})
+exec('pm2 restart inkdown-book', {cwd: root})
