@@ -45,7 +45,7 @@ export const appRouter = router({
   upgrade: procedure.mutation(() => {
     execSync('curl -OL https://github.com/1943time/inkdown-book/releases/latest/download/inkdown-book.tar.gz', {cwd: process.cwd()})
     execSync('tar zvxf inkdown-book.tar.gz', {cwd: process.cwd()})
-    exec('node dist/scripts/upgrade.mjs', {cwd: process.cwd()})
+    execSync('node dist/scripts/upgrade.mjs', {cwd: process.cwd()})
     return {ok: true}
   }),
   getBookDetails: procedure
