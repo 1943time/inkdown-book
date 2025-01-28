@@ -47,7 +47,7 @@ server {
 }
 ```
 
-The service program has been deployed and we can now share any Markdown folder. If you do not wish to deploy using `Docker`, you can [manually install the Node.js runtime environment](#manually-install-nodejs-runtime-environment).
+The service program has been deployed and we can now share any Markdown folder. If you do not wish to deploy using `Docker`, you can manually install the [Node.js runtime environment](#manually-install-nodejs-runtime-environment).
 
 ## Visual Studio Code
 
@@ -167,4 +167,4 @@ pnpm i pm2 -g
 pm2 start ecosystem.config.cjs
 ```
 
-By default, port 3000 is started, and after the program starts, nginx can be used to proxy the domain name to the shared program.
+By default, port `3000` is started, and after the program starts, nginx can be used to proxy the domain name to the shared program.

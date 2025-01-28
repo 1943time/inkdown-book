@@ -12,7 +12,7 @@ Desktop
 
 VsCode
 
-![](.images/ZCuwR91nG1WeRW9.png)
+![](../.images/6xjoQYS7Jnqbtwn.png)
 
 ## Link
 
