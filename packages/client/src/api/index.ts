@@ -1,8 +1,8 @@
 import { CreateTRPCClient, createTRPCClient, httpBatchLink } from '@trpc/client'
 import { AppRouter } from '../../../book/model'
 import { parseDetail } from '../parser/schema'
-import { bulk, DataTree, isLink, nid, parsePath, slugify } from '../utils'
-import pathPkg from 'path-browserify'
+import { bulk, DataTree, isLink, nid, parsePath, slugify, toUnixPath } from '../utils'
+import { extname, isAbsolute, join } from 'path-browserify'
 
 type Mode = 'vscode' | 'inkdown' | 'manual' | 'github' | 'gitlab'
 type Tree = {
@@ -31,6 +31,7 @@ export class IApi {
     mode: Mode
     url: string
     token: string
+    os: string
     fetch: typeof window.fetch
     sha1: (data: any) => string
   }
@@ -68,6 +69,7 @@ export class IApi {
     getFileData: (path: string) => Promise<File | null>
     mode: Mode
     token: string
+    os: string
     fetch: typeof window.fetch
     sha1: (data: any) => string
   }) {
@@ -94,6 +96,7 @@ export class IApi {
       url: options.url,
       token: options.token,
       sha1: options.sha1,
+      os: options.os,
       fetch: options.fetch
     }
   }
@@ -160,9 +163,9 @@ export class IApi {
       
       for (const file of item.medias) {
         if (!isLink(file.url)) {
-          const filePath = pathPkg.isAbsolute(file.url)
+          const filePath = isAbsolute(file.url)
             ? file.url
-            : pathPkg.join(item.realPath || path, '..', file.url)
+            : join(item.realPath || path, '..', file.url)
           addFiles.add(filePath)
           if (!remoteFilesMap.has(filePath)) {
             const data = await this.getFileData(filePath)
@@ -171,7 +174,7 @@ export class IApi {
                 const res = await this.uploadFile({
                   bookId: id,
                   path: filePath,
-                  name: nid() + pathPkg.extname(filePath),
+                  name: nid() + extname(filePath),
                   file: data
                 })
                 if (res.path) {
@@ -189,10 +192,13 @@ export class IApi {
       for (const link of item.links) {
         if (link.url && !isLink(link.url) && link.url.endsWith('.md')) {
           const ps = parsePath(link.url)
-          const target = !pathPkg.isAbsolute(ps.path)
-            ? pathPkg.join(item.realPath!, '..', ps.path)
+          let target = isAbsolute(ps.path)
+            ? join(toUnixPath(item.realPath!), '..', toUnixPath(ps.path))
             : '/' + ps.path
           // console.log('url', link.url, target, this.realPathMap)
+          if (this.options.os === 'windows') {
+            target = target.replace(/\//g, '\\')
+          }
           if (this.realPathMap.get(target)) {
             link.url = this.realPathMap.get(target)! + (ps.hash ? `#${ps.hash}` : '')
           }

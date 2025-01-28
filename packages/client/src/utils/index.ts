@@ -1,13 +1,13 @@
-import path from 'path-browserify'
 import { customAlphabet } from 'nanoid'
 import { remove as removeDiacritics } from 'diacritics'
+import { posix } from 'path-browserify'
 const rControl = /[\u0000-\u001f]/g
 const rSpecial = /[\s~`!@#$%^&*()\-_+=[\]{}|\\;:"'<>,.?/]+/g
 
 export const isLink = (url: string = '') => /^(?:\w+:)?\/\//i.test(url)
 
-export function convertWindowsToUnixPath(winPath: string) {
-  return path.posix.normalize(winPath.replace(/\\/g, '/'))
+export function toUnixPath(winPath: string) {
+  return posix.normalize(winPath.replace(/\\/g, '/'))
 }
 
 
