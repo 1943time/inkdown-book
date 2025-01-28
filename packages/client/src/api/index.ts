@@ -192,7 +192,7 @@ export class IApi {
           const target = !pathPkg.isAbsolute(ps.path)
             ? pathPkg.join(item.realPath!, '..', ps.path)
             : '/' + ps.path
-          console.log('url', link.url, target, this.realPathMap)
+          // console.log('url', link.url, target, this.realPathMap)
           if (this.realPathMap.get(target)) {
             link.url = this.realPathMap.get(target)! + (ps.hash ? `#${ps.hash}` : '')
           }

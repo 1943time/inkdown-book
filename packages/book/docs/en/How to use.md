@@ -25,6 +25,9 @@ server {
     # ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
     # ssl_prefer_server_ciphers on;
     server_name  docs.inkdown.cn;
+    add_header 'Access-Control-Allow-Origin' '*';
+    add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS';
+    add_header 'Access-Control-Allow-Headers' 'Content-Type, Authorization';
     gzip on;
     gzip_comp_level 6;
     gzip_min_length 1k;
