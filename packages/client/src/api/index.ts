@@ -1,7 +1,15 @@
 import { CreateTRPCClient, createTRPCClient, httpBatchLink } from '@trpc/client'
 import { AppRouter } from '../../../book/model'
 import { parseDetail } from '../parser/schema'
-import { bulk, DataTree, isLink, nid, parsePath, slugify, toUnixPath } from '../utils'
+import {
+  bulk,
+  DataTree,
+  isLink,
+  nid,
+  parsePath,
+  slugify,
+  toUnixPath
+} from '../utils'
 import { extname, isAbsolute, join } from 'path-browserify'
 
 type Mode = 'vscode' | 'inkdown' | 'manual' | 'github' | 'gitlab'
@@ -48,13 +56,15 @@ export class IApi {
     Object.keys(data).forEach((key) =>
       form.append(key, data[key as keyof typeof data])
     )
-    return this.options.fetch(this.options.url + '/upload', {
-      method: 'POST',
-      body: form,
-      headers: {
-        Authorization: `Bearer ${this.options.token}`
-      }
-    }).then((res) => res.json())
+    return this.options
+      .fetch(this.options.url + '/upload', {
+        method: 'POST',
+        body: form,
+        headers: {
+          Authorization: `Bearer ${this.options.token}`
+        }
+      })
+      .then((res) => res.json())
   }
   getFileData: (path: string) => Promise<File | null>
   sha1(text: string) {
@@ -113,7 +123,7 @@ export class IApi {
         docs.push({
           name: item.name,
           folder: true,
-          path: [...parentPath, item.name].map(p => slugify(p)).join('/'),
+          path: [...parentPath, item.name].map((p) => slugify(p)).join('/'),
           children: this.transformTree(item.children, [
             ...parentPath,
             item.name
@@ -121,7 +131,7 @@ export class IApi {
         })
       } else {
         const name = item.name.replace(/\.(md|markdown)$/, '')
-        const path = [...parentPath, name].map(p => slugify(p)).join('/')
+        const path = [...parentPath, name].map((p) => slugify(p)).join('/')
         const { schema, links, medias, texts } = parseDetail(item.md!)
         this.docMap.set(path, {
           links,
@@ -141,7 +151,17 @@ export class IApi {
     }
     return docs
   }
-  async syncBook({id, name, data, settings}: {id: string, name: string, data: DataTree[], settings: Record<string, any>}) {
+  async syncBook({
+    id,
+    name,
+    data,
+    settings
+  }: {
+    id: string
+    name: string
+    data: DataTree[]
+    settings: Record<string, any>
+  }) {
     this.docMap.clear()
     this.realPathMap.clear()
     id = slugify(id)
@@ -150,7 +170,7 @@ export class IApi {
       mode: this.options.mode,
       name
     })
-    
+
     const remoteFilesMap = new Map(files.map((f) => [f.path, f.name]))
     const add: { path: string; schema: string; sha: string }[] = []
     const addFiles = new Set<string>()
@@ -163,7 +183,7 @@ export class IApi {
         name,
         texts: item.texts
       })
-      
+
       for (const file of item.medias) {
         if (!isLink(file.url)) {
           const filePath = isAbsolute(file.url)
@@ -193,17 +213,20 @@ export class IApi {
         }
       }
       for (const link of item.links) {
-        if (link.url && !isLink(link.url) && link.url.endsWith('.md')) {
+        if (link.url && !isLink(link.url)) {
           const ps = parsePath(link.url)
-          let target = !isAbsolute(ps.path)
-            ? join(this.nomPath(item.realPath!), '..', this.nomPath(ps.path))
-            : '/' + ps.path
-          if (this.options.os === 'windows') {
-            target = target.replace(/\//g, '\\')
-          }
-          // console.log('url', link.url, target, this.realPathMap)
-          if (this.realPathMap.get(target)) {
-            link.url = this.realPathMap.get(target)! + (ps.hash ? `#${ps.hash}` : '')
+          if (ps.path.endsWith('.md')) {
+            let target = !isAbsolute(ps.path)
+              ? join(this.nomPath(item.realPath!), '..', this.nomPath(ps.path))
+              : '/' + ps.path
+            if (this.options.os === 'windows') {
+              target = target.replace(/\//g, '\\')
+            }
+            // console.log('url', link.url, target, this.realPathMap)
+            if (this.realPathMap.get(target)) {
+              link.url =
+                this.realPathMap.get(target)! + (ps.hash ? `#${ps.hash}` : '')
+            }
           }
         }
       }
@@ -218,7 +241,9 @@ export class IApi {
       (p) => !addFiles.has(p)
     )
 
-    const removeDocs = docs.filter(d => !this.docMap.get(d.path)).map(d => d.path)
+    const removeDocs = docs
+      .filter((d) => !this.docMap.get(d.path))
+      .map((d) => d.path)
     await this.$t.syncBookData.mutate({
       removeDocs: removeDocs,
       removeFiles: removeFiles,
@@ -228,7 +253,7 @@ export class IApi {
       texts: JSON.stringify(textData),
       settings: JSON.stringify(settings)
     })
-    await bulk(add, docs => {
+    await bulk(add, (docs) => {
       return this.$t.insertDocs.mutate({
         add: docs,
         bookId: id
@@ -239,7 +264,7 @@ export class IApi {
   getBook(id: string) {
     return this.$t.getBook.query({ id: slugify(id) })
   }
-  getAllBookId():Promise<{id: string}[]> {
+  getAllBookId(): Promise<{ id: string }[]> {
     return this.$t.getAllBookId.query()
   }
   getBooks(data: {
@@ -247,7 +272,7 @@ export class IApi {
     pageSize: number
     name?: string
     sort: ['created' | 'updated', 'asc' | 'desc']
-  }):Promise<{
+  }): Promise<{
     total: number
     books: {
       created: string
@@ -260,9 +285,9 @@ export class IApi {
     return this.$t.getBooks.query(data)
   }
   deleteBook(id: string) {
-    return this.$t.deleteBook.mutate({bookId: slugify(id)})
+    return this.$t.deleteBook.mutate({ bookId: slugify(id) })
   }
-  getEnv():Promise<{ACCESS_KEY_ID: string, ACCESS_KEY_SECRET:string}> {
+  getEnv(): Promise<{ ACCESS_KEY_ID: string; ACCESS_KEY_SECRET: string }> {
     return this.$t.getEnv.query()
   }
 }
