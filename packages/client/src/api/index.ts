@@ -27,6 +27,9 @@ export class IApi {
     }
   >()
   private realPathMap = new Map<string, string>()
+  private nomPath(p: string) {
+    return this.options.os === 'windows' ? p.replace(/\\/g, '/') : p
+  }
   options: {
     mode: Mode
     url: string
@@ -192,13 +195,13 @@ export class IApi {
       for (const link of item.links) {
         if (link.url && !isLink(link.url) && link.url.endsWith('.md')) {
           const ps = parsePath(link.url)
-          let target = isAbsolute(ps.path)
-            ? join(toUnixPath(item.realPath!), '..', toUnixPath(ps.path))
+          let target = !isAbsolute(ps.path)
+            ? join(this.nomPath(item.realPath!), '..', this.nomPath(ps.path))
             : '/' + ps.path
-          // console.log('url', link.url, target, this.realPathMap)
           if (this.options.os === 'windows') {
             target = target.replace(/\//g, '\\')
           }
+          // console.log('url', link.url, target, this.realPathMap)
           if (this.realPathMap.get(target)) {
             link.url = this.realPathMap.get(target)! + (ps.hash ? `#${ps.hash}` : '')
           }
