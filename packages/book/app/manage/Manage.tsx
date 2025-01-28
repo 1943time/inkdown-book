@@ -78,6 +78,19 @@ export function Manage() {
     }
     setState({ theme: theme || '', ready: true })
   }, [])
+  const upgrade = useCallback(() => {
+    return new Promise((resolve, reject) => {
+      let timer = 0
+      timer = window.setInterval(async () => {
+        await api.getEnv.query()
+        clearTimeout(timer)
+        setTimeout(() => {
+          resolve(null)
+          window.location.reload()
+        }, 3000)
+      }, 2000)
+    })
+  }, [])
   if (!state().ready) {
     return null
   }
@@ -120,15 +133,7 @@ export function Manage() {
                       content: 'Do you want to update Inkdown Book now?',
                       okText: 'Update',
                       onOk: async () => {
-                        await api.upgrade.mutate()
-                        let timer = 0
-                        timer = window.setInterval(async () => {
-                          await api.getEnv.query()
-                          clearTimeout(timer)
-                          setTimeout(() => {
-                            window.location.reload()
-                          }, 3000)
-                        }, 2000)
+                        return upgrade()
                       }
                     })
                   }}
